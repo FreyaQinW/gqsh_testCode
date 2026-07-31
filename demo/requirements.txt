@@ -1,0 +1,5 @@
+pytest==8.4.2
+pytest-order
+playwright
+pytest-playwright
+requests

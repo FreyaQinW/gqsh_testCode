@@ -1,0 +1,178 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🏭 供应商基础资料全链路测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/oss2/test_supplierInfoQualified.py",
+        "tests/api/oss2/test_supplierInfo.py",
+        "tests/api/oss2/test_producer.py",
+        "tests/api/oss2/test_productSource.py",
+        "tests/api/oss2/test_purchasePrice.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "💰 OSS2 财务管理测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/oss2/test_financeManagement.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 采购订单全链路测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/oss2/test_purchaseApplicationRecords.py",
+        "tests/api/oss2/test_orderSearch.py",
+        "tests/api/scms/test_supplierOrder.py",
+        "tests/api/scms/test_deliveryManagement.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 SCMS 质量协同测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/scms/test_qualityCollaboration.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 SCMS 业务管理测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/scms/test_businessManagement.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 SCMS 财务管理测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/scms/test_financeManagement.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 SCMS 基础资料测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/scms/test_basicData.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 SCMS 全部测试",
+      "type": "shell",
+      "command": "/Users/freya/Desktop/code/demo/.venv/bin/python",
+      "args": [
+        "-m", "pytest",
+        "tests/api/scms/",
+        "-v", "--tb=short", "-s"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}
