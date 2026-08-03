@@ -42,6 +42,8 @@ def global_config():
         'productSourceCode': None,
         'name': None,
         'nameCode': None,
+        'omsOrderNo':None,
+        "purchaseOrderNo":None
     }
 
 

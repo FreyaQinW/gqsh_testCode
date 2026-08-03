@@ -37,12 +37,21 @@ def get_api(global_config, path, timeout=10):
         pytest.fail(f'网络请求失败: {e}')
 
 
-def parse_json(response):
-    """解析响应 JSON，失败时直接 fail"""
+def assert_http_ok(response, label=''):
+    """断言 HTTP 状态码为 2xx"""
+    if response is None:
+        pytest.fail(f'{label}响应对象为空')
+    if response.status_code < 200 or response.status_code >= 300:
+        pytest.fail(f'{label}HTTP状态码异常: {response.status_code}')
+
+
+def parse_json(response, label=''):
+    """校验 HTTP 状态后解析响应 JSON，失败时直接 fail"""
+    assert_http_ok(response, label)
     try:
         return response.json()
     except json.JSONDecodeError as e:
-        pytest.fail(f'JSON解析失败: {e}')
+        pytest.fail(f'{label}JSON解析失败: {e}')
 
 
 def assert_success(json_data, label, auth_code=401):
@@ -111,22 +120,83 @@ def current_month_datetime_range():
 
 
 def assert_oms_success(json_data, label):
-    """OMS 接口断言：token 失效时 code=400"""
+    """OMS 接口断言：token 失效时 code=400。
+
+    兼容两种成功形态：
+    1) 标准包：{success: true, data: {...}}
+    2) 裸分页：{totalCount, list, ...}（无 success 字段）
+    """
     if json_data is None:
         pytest.fail(f'{label}接口返回数据为空，请检查接口是否正常')
     if json_data.get('code') == 400:
         pytest.fail('token过期或无效，请检查登录状态')
+    if 'success' not in json_data and isinstance(json_data.get('list'), list):
+        return
     if not json_data.get('success'):
         pytest.fail(f'{label}接口返回数据异常，请检查接口是否正常')
 
 
-def query_oms_list(global_config, path, body, label):
-    """OMS 分页列表：POST → 解析 → 断言 → 空列表 skip"""
+def oms_page_payload(json_data):
+    """取出分页对象：优先 data，其次根级裸分页。"""
+    data = json_data.get('data')
+    if isinstance(data, dict) and isinstance(data.get('list'), list):
+        return data
+    if isinstance(json_data.get('list'), list):
+        return json_data
+    return None
+
+
+def assert_oms_page_shape(json_data, label, body=None):
+    """断言 OMS 分页结构：list 为 list，且不超过 limit/pageSize"""
+    data = oms_page_payload(json_data)
+    if data is None:
+        pytest.fail(f'{label}缺少分页 data.list / list')
+    items = data.get('list')
+    if not isinstance(items, list):
+        pytest.fail(f'{label}缺少 list 列表')
+    if body is not None:
+        limit = body.get('limit') or body.get('pageSize') or 10
+        if len(items) > int(limit):
+            pytest.fail(f'{label}返回条数 {len(items)} 超过 limit={limit}')
+    return items
+
+
+def query_oms_list(global_config, path, body, label, *, skip_if_empty=False):
+    """OMS 分页列表：POST → 解析 → 断言；返回 json。
+
+    skip_if_empty=True 仅用于日志/导出等允许为空的模块。
+    """
     response = post_api(global_config, path, body)
-    json_data = parse_json(response)
-    print(f'{label}接口返回数据: {json_data}')
+    json_data = parse_json(response, f'{label} ')
     assert_oms_success(json_data, label)
-    assert_list_not_empty(json_data, label, skip_if_empty=True)
+    items = assert_oms_page_shape(json_data, label, body)
+    page = oms_page_payload(json_data) or {}
+    total = page.get('totalCount', 0)
+    print(f'{label}: totalCount={total}, pageSize={len(items)}')
+    if total == 0 and not items:
+        if skip_if_empty:
+            pytest.skip(f'{label}返回数据为空')
+        pytest.fail(f'{label}查询结果为空')
+    return json_data
+
+
+def first_oms_list_item(json_data, label, *, skip_if_empty=True):
+    """取分页列表首条；空列表时可 skip"""
+    items = assert_oms_page_shape(json_data, label)
+    if not items:
+        if skip_if_empty:
+            pytest.skip(f'{label}无数据，跳过后续步骤')
+        pytest.fail(f'{label}查询结果为空')
+    return items[0]
+
+
+def pick_oms_id(item, *candidate_keys):
+    """从列表项中按候选字段提取业务主键"""
+    for key in candidate_keys:
+        value = item.get(key)
+        if value not in (None, ''):
+            return key, value
+    pytest.fail(f'列表项缺少业务主键，候选字段: {candidate_keys}，实际 keys={list(item.keys())[:20]}')
 
 
 def purchase_order_search_params(bill_status_list):
@@ -148,10 +218,18 @@ def purchase_order_search_params(bill_status_list):
 
 
 def post_and_assert(global_config, path, body, label):
-    """POST → 解析 → 断言 success"""
+    """POST → 解析 → 断言 success（OSS2/SCMS 语义，auth code=401）"""
     response = post_api(global_config, path, body)
-    json_data = parse_json(response)
+    json_data = parse_json(response, f'{label} ')
     assert_success(json_data, label)
+    return json_data
+
+
+def post_and_assert_oms(global_config, path, body, label):
+    """POST → 解析 → OMS 断言 success（auth code=400）"""
+    response = post_api(global_config, path, body)
+    json_data = parse_json(response, f'{label} ')
+    assert_oms_success(json_data, label)
     return json_data
 
 

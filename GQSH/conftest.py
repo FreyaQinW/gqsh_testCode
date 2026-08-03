@@ -11,6 +11,19 @@ from pages.oss2.login_page import OSS2LoginPage
 from pages.scms.login_page import SCMSLoginPage
 
 
+def pytest_collection_modifyitems(items):
+    """将历史 @pytest.mark.run(order=N) 映射为 pytest-order 的 @pytest.mark.order(N)"""
+    for item in items:
+        run_marker = item.get_closest_marker('run')
+        if not run_marker:
+            continue
+        order = run_marker.kwargs.get('order')
+        if order is None and run_marker.args:
+            order = run_marker.args[0]
+        if order is not None and not item.get_closest_marker('order'):
+            item.add_marker(pytest.mark.order(order))
+
+
 @pytest.fixture(scope="session")
 def browser():
     """启动 Chromium 浏览器（整个测试 session 共用）"""
