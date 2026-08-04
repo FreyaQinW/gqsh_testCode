@@ -2,7 +2,7 @@
 """OMS 数据导入 API 接口测试"""
 # import pytest
 #
-# from utils.api_helper import current_month_datetime_range, query_oms_list
+# from utils.api_helper import current_month_datetime_range, query_oss2_list
 #
 # data_start_time, data_end_time = current_month_datetime_range()
 #
@@ -10,7 +10,7 @@
 # @pytest.mark.oms
 # def test_dataImport_importTaskList(global_config):
 #     """数据导入 - 查询导入任务列表"""
-#     query_oms_list(
+#     query_oss2_list(
 #         global_config,
 #         '/api/oms-admin/api/dataImport/task/page',
 #         {
@@ -30,7 +30,7 @@
 # @pytest.mark.oms
 # def test_dataImport_importTemplateList(global_config):
 #     """数据导入 - 查询导入模板列表"""
-#     query_oms_list(
+#     query_oss2_list(
 #         global_config,
 #         '/api/oms-admin/api/dataImport/template/page',
 #         {
@@ -47,7 +47,7 @@
 # @pytest.mark.oms
 # def test_dataImport_importRecordList(global_config):
 #     """数据导入 - 查询导入记录列表"""
-#     query_oms_list(
+#     query_oss2_list(
 #         global_config,
 #         '/api/oms-admin/api/dataImport/record/page',
 #         {
@@ -64,13 +64,13 @@
 #     )
 
 import pytest
-from utils.api_helper import first_oms_list_item, query_oms_list
+from utils.api_helper import first_oss2_list_item, query_oss2_list
 
 
 @pytest.mark.oms
 def test_dataImport_list(global_config):
     """数据导入 - 查询数据导入列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/dataImport/page',
         {
@@ -80,7 +80,7 @@ def test_dataImport_list(global_config):
         '数据导入列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, '数据导入列表')
+    first = first_oss2_list_item(json_data, '数据导入列表')
     data_import_no = first.get('dataImportNo')
     global_config['dataImportNo'] = data_import_no
     print(f'数据导入 dataImportNo: {data_import_no}')
@@ -90,7 +90,7 @@ def test_dataImport_list(global_config):
 def test_dataImportDetail(global_config):
     """数据导入 - 数据导入列表详情"""
     data_import_no = global_config.get('dataImportNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/dataImport/page',
         {

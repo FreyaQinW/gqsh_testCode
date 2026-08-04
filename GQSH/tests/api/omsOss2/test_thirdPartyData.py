@@ -4,10 +4,10 @@ import pytest
 
 from utils.api_helper import (
     current_month_datetime_range,
-    first_oms_list_item,
-    pick_oms_id,
-    post_and_assert_oms,
-    query_oms_list,
+    first_oss2_list_item,
+    pick_oss2_id,
+    post_and_assert_oss2,
+    query_oss2_list,
 )
 
 data_start_time, data_end_time = current_month_datetime_range()
@@ -25,14 +25,14 @@ _SYNC_LIST_BODY = {
 @pytest.mark.oms
 def test_thirdPartyData_syncList(global_config):
     """三方数据 - 查询三方数据同步列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/thirdPartyData/syncList',
         dict(_SYNC_LIST_BODY),
         '三方数据同步列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, '三方数据同步列表')
+    first = first_oss2_list_item(json_data, '三方数据同步列表')
     third_party_data_no = first.get('thirdPartyDataNo')
     global_config['thirdPartyDataNo'] = third_party_data_no
     print(f'三方数据 thirdPartyDataNo: {third_party_data_no}')
@@ -42,7 +42,7 @@ def test_thirdPartyData_syncList(global_config):
 def test_thirdPartyDataDetail(global_config):
     """三方数据 - 三方数据同步列表详情"""
     third_party_data_no = global_config.get('thirdPartyDataNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/thirdPartyData/syncList',
         {
@@ -59,16 +59,16 @@ def test_thirdPartyDataDetail(global_config):
 @pytest.mark.oms
 def test_thirdPartyData_syncDetail(global_config):
     """三方数据 - 先查同步列表取主键，再查详情"""
-    list_data = query_oms_list(
+    list_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/thirdPartyData/syncList',
         dict(_SYNC_LIST_BODY),
         '三方数据同步列表',
         skip_if_empty=True,
     )
-    item = first_oms_list_item(list_data, '三方数据同步列表')
-    id_key, id_value = pick_oms_id(item, 'syncId', 'id', 'taskId', 'batchNo')
-    post_and_assert_oms(
+    item = first_oss2_list_item(list_data, '三方数据同步列表')
+    id_key, id_value = pick_oss2_id(item, 'syncId', 'id', 'taskId', 'batchNo')
+    post_and_assert_oss2(
         global_config,
         '/api/oms-admin/api/thirdPartyData/syncDetail',
         {
@@ -83,7 +83,7 @@ def test_thirdPartyData_syncDetail(global_config):
 @pytest.mark.oms
 def test_thirdPartyData_channelList(global_config):
     """三方数据 - 查询渠道数据列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/thirdPartyData/channelList',
         {
@@ -95,7 +95,7 @@ def test_thirdPartyData_channelList(global_config):
         '三方数据渠道列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, '三方数据渠道列表')
+    first = first_oss2_list_item(json_data, '三方数据渠道列表')
     channel_code = first.get('channelCode')
     global_config['channelCode'] = channel_code
     print(f'三方数据渠道 channelCode: {channel_code}')
@@ -105,7 +105,7 @@ def test_thirdPartyData_channelList(global_config):
 def test_channelDataDetail(global_config):
     """三方数据 - 渠道数据列表详情"""
     channel_code = global_config.get('channelCode', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/thirdPartyData/channelList',
         {

@@ -4,14 +4,14 @@ import json
 
 import pytest
 
-from utils.api_helper import first_oms_list_item, query_oms_list
+from utils.api_helper import first_oss2_list_item, query_oss2_list
 
 
 @pytest.mark.oms
 @pytest.mark.order(1)
 def test_f2b_Order(global_config):
     """F2B - 订单列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/f2bOrder/page',
         {
@@ -29,7 +29,7 @@ def test_f2b_Order(global_config):
         'f2b 订单列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, 'f2b 订单列表')
+    first = first_oss2_list_item(json_data, 'f2b 订单列表')
     oms_order_no = first.get('omsOrderNo')
     global_config['omsOrderNo'] = oms_order_no
     print(f'【F2B订单编码】{oms_order_no}')
@@ -41,7 +41,7 @@ def test_f2b_orderDetail(global_config):
     """F2B - 按 omsOrderNo 查询订单详情并校验关键字段"""
     oms_order_no = global_config.get('omsOrderNo') or ''
     if not oms_order_no:
-        list_data = query_oms_list(
+        list_data = query_oss2_list(
             global_config,
             '/api/oms-admin/api/f2bOrder/page',
             {
@@ -59,13 +59,13 @@ def test_f2b_orderDetail(global_config):
             'f2b 订单列表',
             skip_if_empty=True,
         )
-        oms_order_no = first_oms_list_item(list_data, 'f2b 订单列表').get('omsOrderNo')
+        oms_order_no = first_oss2_list_item(list_data, 'f2b 订单列表').get('omsOrderNo')
         global_config['omsOrderNo'] = oms_order_no
 
     if not oms_order_no:
         pytest.skip('无可用 omsOrderNo，跳过订单详情')
 
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/f2bOrder/page',
         {
@@ -85,7 +85,7 @@ def test_f2b_orderDetail(global_config):
     )
     print(f'f2b 订单详情完整响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
 
-    detail = first_oms_list_item(json_data, 'f2b 订单详情', skip_if_empty=False)
+    detail = first_oss2_list_item(json_data, 'f2b 订单详情', skip_if_empty=False)
     required_fields = (
         'omsOrderNo',
         'thirdOrderNo',
@@ -143,7 +143,7 @@ def test_f2b_orderDetail(global_config):
 def test_f2b_deliveryList(global_config):
     """F2B - 查询 F2B 发货单列表"""
     oms_order_no = global_config.get('omsOrderNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/f2bDelivery/page',
         {
@@ -159,7 +159,7 @@ def test_f2b_deliveryList(global_config):
         'F2B发货列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, 'F2B发货列表')
+    first = first_oss2_list_item(json_data, 'F2B发货列表')
     delivery_no = first.get('deliveryNo')
     global_config['deliveryNo'] = delivery_no
     print(f'F2B发货单 deliveryNo: {delivery_no}')
@@ -170,7 +170,7 @@ def test_f2b_deliveryList(global_config):
 def test_f2bDeliveryDetail(global_config):
     """F2B - 发货单列表详情"""
     delivery_no = global_config.get('deliveryNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/f2bDelivery/page',
         {

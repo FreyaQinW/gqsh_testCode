@@ -119,8 +119,8 @@ def current_month_datetime_range():
     return start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def assert_oms_success(json_data, label):
-    """OMS 接口断言：token 失效时 code=400。
+def assert_oss2_success(json_data, label):
+    """OSS2 接口断言：token 失效时 code=400。
 
     兼容两种成功形态：
     1) 标准包：{success: true, data: {...}}
@@ -136,7 +136,7 @@ def assert_oms_success(json_data, label):
         pytest.fail(f'{label}接口返回数据异常，请检查接口是否正常')
 
 
-def oms_page_payload(json_data):
+def oss2_page_payload(json_data):
     """取出分页对象：优先 data，其次根级裸分页。"""
     data = json_data.get('data')
     if isinstance(data, dict) and isinstance(data.get('list'), list):
@@ -146,9 +146,9 @@ def oms_page_payload(json_data):
     return None
 
 
-def assert_oms_page_shape(json_data, label, body=None):
-    """断言 OMS 分页结构：list 为 list，且不超过 limit/pageSize"""
-    data = oms_page_payload(json_data)
+def assert_oss2_page_shape(json_data, label, body=None):
+    """断言 OSS2 分页结构：list 为 list，且不超过 limit/pageSize"""
+    data = oss2_page_payload(json_data)
     if data is None:
         pytest.fail(f'{label}缺少分页 data.list / list')
     items = data.get('list')
@@ -161,16 +161,16 @@ def assert_oms_page_shape(json_data, label, body=None):
     return items
 
 
-def query_oms_list(global_config, path, body, label, *, skip_if_empty=False):
-    """OMS 分页列表：POST → 解析 → 断言；返回 json。
+def query_oss2_list(global_config, path, body, label, *, skip_if_empty=False):
+    """OSS2 分页列表：POST → 解析 → 断言；返回 json。
 
     skip_if_empty=True 仅用于日志/导出等允许为空的模块。
     """
     response = post_api(global_config, path, body)
     json_data = parse_json(response, f'{label} ')
-    assert_oms_success(json_data, label)
-    items = assert_oms_page_shape(json_data, label, body)
-    page = oms_page_payload(json_data) or {}
+    assert_oss2_success(json_data, label)
+    items = assert_oss2_page_shape(json_data, label, body)
+    page = oss2_page_payload(json_data) or {}
     total = page.get('totalCount', 0)
     print(f'{label}: totalCount={total}, pageSize={len(items)}')
     if total == 0 and not items:
@@ -180,9 +180,9 @@ def query_oms_list(global_config, path, body, label, *, skip_if_empty=False):
     return json_data
 
 
-def first_oms_list_item(json_data, label, *, skip_if_empty=True):
+def first_oss2_list_item(json_data, label, *, skip_if_empty=True):
     """取分页列表首条；空列表时可 skip"""
-    items = assert_oms_page_shape(json_data, label)
+    items = assert_oss2_page_shape(json_data, label)
     if not items:
         if skip_if_empty:
             pytest.skip(f'{label}无数据，跳过后续步骤')
@@ -190,7 +190,7 @@ def first_oms_list_item(json_data, label, *, skip_if_empty=True):
     return items[0]
 
 
-def pick_oms_id(item, *candidate_keys):
+def pick_oss2_id(item, *candidate_keys):
     """从列表项中按候选字段提取业务主键"""
     for key in candidate_keys:
         value = item.get(key)
@@ -225,11 +225,11 @@ def post_and_assert(global_config, path, body, label):
     return json_data
 
 
-def post_and_assert_oms(global_config, path, body, label):
-    """POST → 解析 → OMS 断言 success（auth code=400）"""
+def post_and_assert_oss2(global_config, path, body, label):
+    """POST → 解析 → OSS2 断言 success（auth code=400）"""
     response = post_api(global_config, path, body)
     json_data = parse_json(response, f'{label} ')
-    assert_oms_success(json_data, label)
+    assert_oss2_success(json_data, label)
     return json_data
 
 

@@ -5,13 +5,13 @@ import json
 import pytest
 
 from utils.api_helper import (
-    assert_oms_success,
+    assert_oss2_success,
     current_month_datetime_range,
-    first_oms_list_item,
-    oms_page_payload,
+    first_oss2_list_item,
+    oss2_page_payload,
     parse_json,
     post_api,
-    query_oms_list,
+    query_oss2_list,
 )
 
 purchase_start_time, purchase_end_time = current_month_datetime_range()
@@ -85,8 +85,8 @@ def _query_list_items(global_config, path, body, label):
     """POST 分页列表，返回 list（允许为空，不 skip）。"""
     response = post_api(global_config, path, body)
     json_data = parse_json(response, f'{label} ')
-    assert_oms_success(json_data, label)
-    page = oms_page_payload(json_data) or {}
+    assert_oss2_success(json_data, label)
+    page = oss2_page_payload(json_data) or {}
     items = page.get('list') or []
     print(f'{label}: totalCount={page.get("totalCount", 0)}, pageSize={len(items)}')
     return items
@@ -136,7 +136,7 @@ def _assert_detail_by_filter(
     summary_rows,
 ):
     """按单号查详情页 → 打完整响应 → 校验字段/单号 → 打印摘要。"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         path,
         filter_body,
@@ -145,7 +145,7 @@ def _assert_detail_by_filter(
     )
     print(f'{label}完整响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
 
-    detail = first_oms_list_item(json_data, label, skip_if_empty=False)
+    detail = first_oss2_list_item(json_data, label, skip_if_empty=False)
     _assert_required_fields(detail, required_fields, label)
     if detail.get(id_key) != expected_id:
         pytest.fail(f'{label}单号不匹配，期望={expected_id}，实际={detail.get(id_key)}')

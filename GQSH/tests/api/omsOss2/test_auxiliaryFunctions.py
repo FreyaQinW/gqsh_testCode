@@ -2,7 +2,7 @@
 """OMS 辅助功能 API 接口测试"""
 import pytest
 
-from utils.api_helper import current_month_datetime_range, first_oms_list_item, query_oms_list
+from utils.api_helper import current_month_datetime_range, first_oss2_list_item, query_oss2_list
 
 data_start_time, data_end_time = current_month_datetime_range()
 
@@ -10,7 +10,7 @@ data_start_time, data_end_time = current_month_datetime_range()
 @pytest.mark.oms
 def test_auxiliaryFunctions_operationLog(global_config):
     """辅助功能 - 查询操作日志列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/auxiliary/operationLog/page',
         {
@@ -30,7 +30,7 @@ def test_auxiliaryFunctions_operationLog(global_config):
 @pytest.mark.oms
 def test_auxiliaryFunctions_exportTaskList(global_config):
     """辅助功能 - 查询导出任务列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/auxiliary/exportTask/page',
         {
@@ -49,7 +49,7 @@ def test_auxiliaryFunctions_exportTaskList(global_config):
 @pytest.mark.oms
 def test_auxiliaryFunctions_messageList(global_config):
     """辅助功能 - 查询系统消息列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/auxiliary/message/page',
         {
@@ -68,7 +68,7 @@ def test_auxiliaryFunctions_messageList(global_config):
 @pytest.mark.oms
 def test_auxiliaryFunctions_list(global_config):
     """辅助功能 - 查询辅助功能列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/auxiliaryFunctions/page',
         {
@@ -78,7 +78,7 @@ def test_auxiliaryFunctions_list(global_config):
         '辅助功能列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, '辅助功能列表')
+    first = first_oss2_list_item(json_data, '辅助功能列表')
     auxiliary_functions_no = first.get('auxiliaryFunctionsNo')
     global_config['auxiliaryFunctionsNo'] = auxiliary_functions_no
     print(f'辅助功能 auxiliaryFunctionsNo: {auxiliary_functions_no}')
@@ -88,7 +88,7 @@ def test_auxiliaryFunctions_list(global_config):
 def test_auxiliaryFunctionsDetail(global_config):
     """辅助功能 - 辅助功能列表详情"""
     auxiliary_functions_no = global_config.get('auxiliaryFunctionsNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/auxiliaryFunctions/page',
         {

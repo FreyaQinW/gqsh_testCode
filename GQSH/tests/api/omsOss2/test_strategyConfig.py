@@ -2,13 +2,13 @@
 """OMS 策略配置 API 接口测试"""
 import pytest
 
-from utils.api_helper import first_oms_list_item, query_oms_list
+from utils.api_helper import first_oss2_list_item, query_oss2_list
 
 
 @pytest.mark.oms
 def test_strategyConfig_routingList(global_config):
     """策略配置 - 查询订单路由策略列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/strategy/routing/page',
         {
@@ -26,7 +26,7 @@ def test_strategyConfig_routingList(global_config):
 @pytest.mark.oms
 def test_strategyConfig_allocationList(global_config):
     """策略配置 - 查询分仓策略列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/strategy/allocation/page',
         {
@@ -45,7 +45,7 @@ def test_strategyConfig_allocationList(global_config):
 @pytest.mark.oms
 def test_strategyConfig_inventoryStrategyList(global_config):
     """策略配置 - 查询库存策略列表"""
-    query_oms_list(
+    query_oss2_list(
         global_config,
         '/api/oms-admin/api/strategy/inventory/page',
         {
@@ -64,7 +64,7 @@ def test_strategyConfig_inventoryStrategyList(global_config):
 @pytest.mark.oms
 def test_strategyConfig_list(global_config):
     """策略配置 - 查询策略配置列表"""
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/strategyConfig/page',
         {
@@ -74,7 +74,7 @@ def test_strategyConfig_list(global_config):
         '策略配置列表',
         skip_if_empty=True,
     )
-    first = first_oms_list_item(json_data, '策略配置列表')
+    first = first_oss2_list_item(json_data, '策略配置列表')
     strategy_config_no = first.get('strategyConfigNo')
     global_config['strategyConfigNo'] = strategy_config_no
     print(f'策略配置 strategyConfigNo: {strategy_config_no}')
@@ -84,7 +84,7 @@ def test_strategyConfig_list(global_config):
 def test_strategyConfigDetail(global_config):
     """策略配置 - 策略配置列表详情"""
     strategy_config_no = global_config.get('strategyConfigNo', '')
-    json_data = query_oms_list(
+    json_data = query_oss2_list(
         global_config,
         '/api/oms-admin/api/strategyConfig/page',
         {
