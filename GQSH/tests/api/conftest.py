@@ -45,7 +45,14 @@ def global_config():
         'omsOrderNo':None,
         "purchaseOrderNo":None,
         'complainId': None,
-        'producerReportId': None
+        'producerReportId': None,
+        'complainId': None,
+        'qualityInspectionId': None,
+        'producerReportId': None,
+        'qualityInspectionId': None,
+        'producerReportId': None,
+        'packageProductCode': None,
+        'accidentId': None,
     }
 
 
