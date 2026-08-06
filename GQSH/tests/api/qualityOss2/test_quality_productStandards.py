@@ -1,84 +1,65 @@
 # -*- coding: utf-8 -*-
-"""quality  产品标准管理 接口测试"""
-import json
-
+"""quality 产品标准管理接口测试"""
 import pytest
 
-from utils.api_helper import parse_json, post_api, assert_success, assert_list_not_empty
+from utils.quality_helper import (
+    QUALITY_PREFIX,
+    first_item_id,
+    post_quality_and_assert,
+    query_quality_list,
+)
 
 
-@pytest.mark.oms
+@pytest.mark.quality
+@pytest.mark.order(1)
 def test_quality_productStandardsList(global_config):
     """质量 - 产品标准管理列表"""
-    response = post_api(
+    _, items = query_quality_list(
         global_config,
-        '/api/gq-quality-scrm/gq-quality-scrm/product/standards/list',
+        f'{QUALITY_PREFIX}/product/standards/list',
         {
-            "pageNo": 1,
-            "pageSize": 10,
-            "statusList": [1]
-        }
+            'pageNo': 1,
+            'pageSize': 10,
+            'statusList': [1],
+        },
+        '产品标准列表',
+        skip_if_empty=True,
     )
-    json_data = parse_json(response, '产品标准列表')
-    assert_success(json_data, '产品标准列表')
-    print(f'产品标准列表 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
-    assert_list_not_empty(json_data, '产品标准列表', skip_if_empty=True)
-
-    # 提取首条记录的 ID，保存为公共参数
-    data = json_data.get('data', {})
-    items = data.get('list') or data.get('records') or []
-    first_item = items[0]
-    standard_id = first_item.get('id')
+    standard_id = first_item_id(items, 'id')
+    if not standard_id:
+        pytest.skip('产品标准列表首条缺少 id')
     global_config['productStandardId'] = standard_id
-    print(f'产品标准 ID: {standard_id}')
+    print(f'【产品标准 ID】{standard_id}')
 
 
-@pytest.mark.oms
+@pytest.mark.quality
+@pytest.mark.order(2)
 def test_quality_productStandardsEdit(global_config):
-    """质量 - 产品标准编辑"""
+    """质量 - 产品标准编辑（不上传签名文件，避免硬编码 OSS 凭证）"""
     standard_id = global_config.get('productStandardId')
+    if not standard_id:
+        _, items = query_quality_list(
+            global_config,
+            f'{QUALITY_PREFIX}/product/standards/list',
+            {'pageNo': 1, 'pageSize': 10, 'statusList': [1]},
+            '产品标准列表',
+            skip_if_empty=True,
+        )
+        standard_id = first_item_id(items, 'id')
+        global_config['productStandardId'] = standard_id
     if not standard_id:
         pytest.skip('未获取到产品标准 ID，跳过编辑测试')
 
-    response = post_api(
+    post_quality_and_assert(
         global_config,
-        '/api/gq-quality-scrm/gq-quality-scrm/product/standards/edit',
+        f'{QUALITY_PREFIX}/product/standards/edit',
         {
-            "id": standard_id,
-            "standardsList": [
-                {
-                    "type": 1,
-                    "name": "产品标准",
-                    "syncHuading": True,
-                    "files": [
-                        {
-                            "name": "统一社会信用代码.jpeg",
-                            "key": "20260722/统一社会信用代码.jpeg",
-                            "url": "https://guoquan-product-test.oss-cn-shanghai.aliyuncs.com/20260722/%E7%BB%9F%E4%B8%80%E7%A4%BE%E4%BC%9A%E4%BF%A1%E7%94%A8%E4%BB%A3%E7%A0%81.jpeg?Expires=1785845385&OSSAccessKeyId=LTAI5t9i6b8LhKQS9kju4rr5&Signature=yEfxbAjSyhI5JjNvzyYTVUYoI7c%3D"
-                        }
-                    ]
-                },
-                {
-                    "type": 2,
-                    "name": "工艺标准",
-                    "syncHuading": True,
-                    "files": []
-                },
-                {
-                    "type": 3,
-                    "name": "原料标准",
-                    "syncHuading": True,
-                    "files": [
-                        {
-                            "name": "IMG_1991.jpg",
-                            "key": "20260722/IMG_1991.jpg",
-                            "url": "https://guoquan-product-test.oss-cn-shanghai.aliyuncs.com/20260722/IMG_1991.jpg?Expires=1785845385&OSSAccessKeyId=LTAI5t9i6b8LhKQS9kju4rr5&Signature=7rv9yfzL2zomVTOx8Do0YlvSBNg%3D"
-                        }
-                    ]
-                }
-            ]
-        }
+            'id': standard_id,
+            'standardsList': [
+                {'type': 1, 'name': '产品标准', 'syncHuading': False, 'files': []},
+                {'type': 2, 'name': '工艺标准', 'syncHuading': False, 'files': []},
+                {'type': 3, 'name': '原料标准', 'syncHuading': False, 'files': []},
+            ],
+        },
+        '产品标准编辑',
     )
-    json_data = parse_json(response, '产品标准编辑')
-    assert_success(json_data, '产品标准编辑')
-    print(f'产品标准编辑 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')

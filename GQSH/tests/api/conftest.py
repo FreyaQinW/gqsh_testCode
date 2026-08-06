@@ -37,22 +37,22 @@ def global_config():
         'test_URL': 'https://test-oss2.zzgqsh.com',
         'header': header,
         'JINDIE_PURCHASE_ORDER_NO': None,
-        'documentNo': None,
-        'relatedOrder': None,
-        'productSourceCode': None,
-        'name': None,
-        'nameCode': None,
-        'omsOrderNo':None,
-        "purchaseOrderNo":None,
-        'complainId': None,
-        'producerReportId': None,
-        'complainId': None,
-        'qualityInspectionId': None,
-        'producerReportId': None,
-        'qualityInspectionId': None,
-        'producerReportId': None,
-        'packageProductCode': None,
-        'accidentId': None,
+        'documentNo': None, # 采购申请单编号
+        'relatedOrder': None,   # 相关订单
+        'productSourceCode': None,  # 生产商编码
+        'name': None, # 名称
+        'nameCode': None,  # 名称编码
+        'omsOrderNo':None, # OMS 订单号
+        "purchaseOrderNo":None, # 采购单号
+        'complainId': None, # 投诉 ID
+        'qualityInspectionId': None,    # 质量检验 ID
+        'producerReportId': None,   # 生产报告 ID
+        'packageProductCode': None, # 包装产品编码
+        'accidentId': None, # 质量事故 ID
+        'purchase_spu_code': None, # 商品中心编码
+        'deptCode': None, # 商品中心仓库编码
+        'prodLifeHouseId': None, # 商品产品生命周期仓库 ID
+        'lifeCycleTypeValue': None, # 商品产品生命周期类型值
     }
 
 

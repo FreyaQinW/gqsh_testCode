@@ -1,53 +1,70 @@
 # -*- coding: utf-8 -*-
-"""quality  普通客诉 接口测试"""
-import json
-
+"""quality 普通客诉接口测试"""
 import pytest
 
-from utils.api_helper import parse_json, post_api, assert_success, assert_list_not_empty
+from utils.quality_helper import (
+    QUALITY_PREFIX,
+    assert_detail_id,
+    first_item_id,
+    post_quality_and_assert,
+    query_quality_list,
+)
 
 
-@pytest.mark.oms
+@pytest.mark.quality
+@pytest.mark.order(1)
 def test_quality_normalComplainList(global_config):
     """普通客诉 - 查询普通客诉列表"""
-    response = post_api(
+    _, items = query_quality_list(
         global_config,
-        '/api/gq-quality-scrm/gq-quality-scrm/normal/complain/list',
+        f'{QUALITY_PREFIX}/normal/complain/list',
         {
-            "pageNo": 1,
-            "pageSize": 10,
-            "dutyType": 2,
-            "beginBizMonth": "",
-            "endBizMonth": "",
-            "statusList": []
+            'pageNo': 1,
+            'pageSize': 10,
+            'dutyType': 2,
+            'beginBizMonth': '',
+            'endBizMonth': '',
+            'statusList': [],
         },
+        '普通客诉列表',
+        skip_if_empty=True,
     )
-    json_data = parse_json(response, '普通客诉列表 ')
-    assert_success(json_data, '普通客诉列表')
-    print(f'普通客诉列表 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
-    assert_list_not_empty(json_data, '普通客诉列表', skip_if_empty=True)
-
-    # 提取首条记录的 ID，传递给详情测试
-    data = json_data.get('data', {})
-    items = data.get('list') or data.get('records') or []
-    first_item = items[0]
-    complain_id = first_item.get('id')
+    complain_id = first_item_id(items, 'id')
+    if not complain_id:
+        pytest.skip('普通客诉列表首条缺少 id')
     global_config['complainId'] = complain_id
-    print(f'普通客诉 ID: {complain_id}')
+    print(f'【普通客诉 ID】{complain_id}')
 
 
-@pytest.mark.oms
+@pytest.mark.quality
+@pytest.mark.order(2)
 def test_quality_normalComplainDetail(global_config):
     """普通客诉 - 查询普通客诉详情"""
     complain_id = global_config.get('complainId')
     if not complain_id:
+        _, items = query_quality_list(
+            global_config,
+            f'{QUALITY_PREFIX}/normal/complain/list',
+            {
+                'pageNo': 1,
+                'pageSize': 10,
+                'dutyType': 2,
+                'beginBizMonth': '',
+                'endBizMonth': '',
+                'statusList': [],
+            },
+            '普通客诉列表',
+            skip_if_empty=True,
+        )
+        complain_id = first_item_id(items, 'id')
+        global_config['complainId'] = complain_id
+    if not complain_id:
         pytest.skip('未获取到普通客诉 ID，跳过详情测试')
 
-    response = post_api(
+    json_data = post_quality_and_assert(
         global_config,
-        '/api/gq-quality-scrm/gq-quality-scrm/normal/complain/detail',
-        {"id": complain_id},
+        f'{QUALITY_PREFIX}/normal/complain/detail',
+        {'id': complain_id},
+        '普通客诉详情',
     )
-    json_data = parse_json(response, '普通客诉详情 ')
-    assert_success(json_data, '普通客诉详情')
-    print(f'普通客诉详情 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+    assert_detail_id(json_data, complain_id, label='普通客诉详情')
