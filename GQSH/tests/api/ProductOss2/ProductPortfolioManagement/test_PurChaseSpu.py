@@ -388,3 +388,166 @@ def test_pushProductStatusBySpu(global_config):
     json_data = parse_json(response, '推送产品状态')
     assert_success(json_data, '推送产品状态')
     print(f'推送产品状态 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
+
+    """渠道产品管理 - 查询金蝶渠道SPU列表"""
+
+    @pytest.mark.oms
+    def test_queryKingDeeDetailInfo(global_config):
+        """渠道产品管理 - 查询金蝶明细信息"""
+        purchase_spu_code = global_config.get('purchaseSpuCode')
+        if not purchase_spu_code:
+            pytest.skip('未获取到 purchaseSpuCode，跳过金蝶明细信息查询')
+
+        response = post_api(
+            global_config,
+            '/api/shop-admin/shop-admin/product/queryKingDeeDetailInfo',
+            {
+                "purchaseSpuCode": purchase_spu_code
+            },
+        )
+        json_data = parse_json(response, '金蝶明细信息')
+        assert_success(json_data, '金蝶明细信息')
+        print(f'金蝶明细信息 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
+
+
+    @pytest.mark.oms
+    def test_queryKingDeeChannelSpuList(global_config):
+        """渠道产品管理 - 查询金蝶渠道SPU列表"""
+        response = post_api(
+            global_config,
+            '/api/shop-admin/shop-admin/product/queryKingDeeChannelSpuList',
+            {
+                "pageNo": 1,
+                "pageSize": 30,
+                "total": 5414
+            },
+        )
+        json_data = parse_json(response, '金蝶渠道SPU列表')
+        assert_success(json_data, '金蝶渠道SPU列表')
+        print(f'金蝶渠道SPU列表 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
+
+@pytest.mark.oms
+def test_getCloudSkuInfo(global_config):
+    """产品管理 - 获取云SKU信息"""
+    purchase_spu_code = global_config.get('purchaseSpuCode')
+    purchase_spu_spec_id = global_config.get('purchaseSpuSpecId')
+    if not purchase_spu_code or not purchase_spu_spec_id:
+        pytest.skip('未获取到 purchaseSpuCode 或 purchaseSpuSpecId，跳过获取云SKU信息测试')
+
+    response = post_api(
+        global_config,
+        '/api/shop-admin/shop-admin/purchase/cloud/getCloudSkuInfo',
+        {
+            "type": "edit",
+            "change": 1,
+            "purchaseSpuCode": purchase_spu_code,
+            "purchaseSpuSpecId": purchase_spu_spec_id,
+            "saleUnitInfoList": [
+                {
+                    "saleUnit": "SPZXDWZ0325326",
+                    "saleUnitValue": "件",
+                    "isBasic": 0
+                }
+            ],
+            "flag": 1,
+            "hideImage": True,
+            "size": 1
+        },
+    )
+    json_data = parse_json(response, '获取云SKU信息')
+    assert_success(json_data, '获取云SKU信息')
+    print(f'获取云SKU信息 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
+
+@pytest.mark.oms
+def test_saveCloudSkuInfo(global_config):
+    """产品管理 - 保存云SKU信息"""
+    purchase_spu_code = global_config.get('purchaseSpuCode')
+    purchase_spu_id = global_config.get('purchaseSpuId')
+    purchase_spu_spec_id = global_config.get('purchaseSpuSpecId')
+    if not purchase_spu_code or not purchase_spu_id or not purchase_spu_spec_id:
+        pytest.skip('未获取到 purchaseSpuCode/purchaseSpuId/purchaseSpuSpecId，跳过保存云SKU信息测试')
+
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    product_name = f"自动产品名称{timestamp}"
+
+    response = post_api(
+        global_config,
+        '/api/shop-admin/shop-admin/purchase/cloud/saveCloudSkuInfo',
+        {
+            "categoryId": 4484,
+            "shortName": product_name,
+            "fullName": product_name,
+            "pricingManner": "",
+            "purchaseSpuCode": purchase_spu_code,
+            "purchaseSpuId": purchase_spu_id,
+            "skuCodeList": [],
+            "skuName": product_name,
+            "specQualityList": [
+                {
+                    "barCode": "1008789AWR",
+                    "solids": None,
+                    "purchaseSpuSpecId": purchase_spu_spec_id,
+                    "shippingPrice": "199",
+                    "minPrice": "",
+                    "saleUnit": "SPZXDWZ0325326",
+                    "skuId": None,
+                    "skuCode": None,
+                    "supplierCode": "VEN00627",
+                    "purchaseSpuSpec": "2g/串",
+                    "multiple": 1,
+                    "specId": 1,
+                    "plannedOffTime": "",
+                    "specInfo": {
+                        "value": "2",
+                        "specName": None,
+                        "number": None,
+                        "specUnit": None,
+                        "spec": None,
+                        "specStr": "2g/串",
+                        "specId": 1
+                    }
+                }
+            ],
+            "cloudAttributeVoList": [
+                {
+                    "value": "2g/串",
+                    "skuCode": None,
+                    "saleUnit": "SPZXDWZ0325326",
+                    "shippingPrice": 199,
+                    "specId": 1
+                }
+            ],
+            "checkRemovePropertyLst": [],
+            "entranceFlag": 1
+        },
+    )
+    json_data = parse_json(response, '保存云SKU信息')
+    assert_success(json_data, '保存云SKU信息')
+    print(f'保存云SKU信息 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
+
+@pytest.mark.oms
+def test_queryPurchaseSkuDetailInfo(global_config):
+    """产品管理 - 查询采购SKU明细"""
+    purchase_spu_code = global_config.get('purchaseSpuCode')
+    purchase_spu_spec_id = global_config.get('purchaseSpuSpecId')
+    if not purchase_spu_code or not purchase_spu_spec_id:
+        pytest.skip('未获取到 purchaseSpuCode 或 purchaseSpuSpecId，跳过查询采购SKU明细测试')
+
+    response = post_api(
+        global_config,
+        '/api/shop-admin/shop-admin/purchase/sku/queryPurchaseSkuDetailInfo',
+        {
+            "purchaseSpuCode": purchase_spu_code,
+            "businessTypeList": ["o2o", "next_day_delivery", "b2c", "f2b", "hk_o2o"],
+            "purchaseSpuSpecId": purchase_spu_spec_id
+        }
+    )
+    json_data = parse_json(response, '查询采购SKU明细')
+    assert_success(json_data, '查询采购SKU明细')
+    print(f'查询采购SKU明细 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
+
