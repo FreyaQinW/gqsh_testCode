@@ -1,0 +1,233 @@
+{
+  "success": true,
+  "data": {
+    "totalCount": 31,
+    "totalPage": 2,
+    "pageSize": 20,
+    "currPage": 1,
+    "list": [
+      {
+        "id": 81,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshCacheShopSkuSaleStatus",
+        "interfaceLocation": "CacheClient.refreshCacheShopSkuSaleStatus",
+        "interfaceDescribe": "POS-刷新门店商品状态",
+        "param": "{\n  \"shopCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 82,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshCategory",
+        "interfaceLocation": "SkuPriceCacheCheckClient.refreshCategory",
+        "interfaceDescribe": "POS-刷新分类",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 83,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshCategorySku",
+        "interfaceLocation": "SkuPriceCacheCheckClient.refreshCategorySku",
+        "interfaceDescribe": "POS-刷新分类商品",
+        "param": "{\n \"shopCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 84,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshSkuInfo",
+        "interfaceLocation": "SkuPriceCacheCheckClient.refreshSkuInfo",
+        "interfaceDescribe": "POS-刷新SKU缓存",
+        "param": "{\n    \"skuCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 85,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshAreaSalePlan",
+        "interfaceLocation": "SkuPriceCacheCheckClient.refreshAreaSalePlan",
+        "interfaceDescribe": "POS-刷新门店对应的销售方案",
+        "param": "{\n  \"shopCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 86,
+        "serviceType": "gq-product-highperf-center",
+        "serviceTypeName": "product-highperf",
+        "interfaceUniqueCode": "refreshAreaPrice",
+        "interfaceLocation": "SkuPriceCacheCheckClient.refreshAreaPrice",
+        "interfaceDescribe": "商城-刷门店价格区域的缓存",
+        "param": "{\n  \"priceAreaCodeList\": [],\n  \"skuCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 87,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "item_code",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷商品信息的缓存",
+        "param": "{\n \"skuCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 88,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "spu_code",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷产品信息的缓存",
+        "param": "{\n  \"spuCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 89,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "area_price",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷区域价格的缓存",
+        "param": "{\n    \"shopCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 90,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "shop_online_item",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷门店商品状态的缓存",
+        "param": "{\n    \"shopCode\": \"\"\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 91,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "o2o_mapping_item",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷自营商城编码映射商品编码的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 92,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "item_channel_online_status",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷商品渠道上架状态的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 93,
+        "serviceType": "guoquan-product-center",
+        "serviceTypeName": "product",
+        "interfaceUniqueCode": "item_sale_area_info",
+        "interfaceLocation": "RedisCacheClient.syncRedisCache",
+        "interfaceDescribe": "商城-刷商品售卖区域信息的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 94,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "menu",
+        "interfaceLocation": "SyncMenuCacheClient.syncAllMenuItemInfoCache",
+        "interfaceDescribe": "云埔-刷菜单商品的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 95,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "menuSku",
+        "interfaceLocation": "SyncMenuCacheClient.syncAllMenuTreeInfoCache",
+        "interfaceDescribe": "云埔-刷菜单树的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 96,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "skuInfo",
+        "interfaceLocation": "SyncSkuBaseInfoCacheClient.syncAllSkuInfoCache",
+        "interfaceDescribe": "云埔-刷SKU基础信息的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 97,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "spuInfo",
+        "interfaceLocation": "SyncSpuBaseInfoCacheClient.syncAllSpuInfoCache",
+        "interfaceDescribe": "云埔-刷SPU基础信息的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 98,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "skuStatus",
+        "interfaceLocation": "SyncShopSkuStatusInfoCacheClient.syncShopSkuStatusInfoCache",
+        "interfaceDescribe": "云埔-刷SKU状态信息的缓存",
+        "param": "{\n    \"shopCodeList\": [],\n   \"skuCodeList\": [],\n    \"skuIdList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 99,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "skuSalePlan",
+        "interfaceLocation": "SyncSalePlanInfoCacheClient.syncAllSalePlaInfoCache",
+        "interfaceDescribe": "云埔-刷SKU价格信息的缓存",
+        "param": "{}",
+        "pushShow": false,
+        "refreshShow": true
+      },
+      {
+        "id": 100,
+        "serviceType": "guoquan-product-front-center",
+        "serviceTypeName": "product-front",
+        "interfaceUniqueCode": "shopMenu",
+        "interfaceLocation": "SyncDb2RedisClient.syncShopMenuRedisCache",
+        "interfaceDescribe": "云埔-刷菜单状态的缓存",
+        "param": "{\n  \"shopCodeList\": []\n}",
+        "pushShow": false,
+        "refreshShow": true
+      }
+    ]
+  },
+  "code": 200,
+  "msg": "成功"
+}

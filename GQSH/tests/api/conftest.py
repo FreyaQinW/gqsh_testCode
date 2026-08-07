@@ -53,6 +53,9 @@ def global_config():
         'deptCode': None, # 商品中心仓库编码
         'prodLifeHouseId': None, # 商品产品生命周期仓库 ID
         'lifeCycleTypeValue': None, # 商品产品生命周期类型值
+        'purchaseSpuCode': None, # 产品管理采购SPU编码
+        'purchaseSpuId': None, # 产品管理采购SPU ID
+        'kingDeeSkuCode': None, # 金蝶SKU编码
     }
 
 

@@ -1,0 +1,93 @@
+{
+  "purchaseSpuId": 9551,
+  "code": "105672",
+  "productPoolCode": null,
+  "supplierProductName": null,
+  "purchasingName": "自动产品名称20260807121859",
+  "parentCategory": null,
+  "firstCategory": null,
+  "category": "火锅类/肉卷类/羊肉卷类/羊肉",
+  "categoryIdList": null,
+  "categoryUnionName": null,
+  "blackPearlParentCategory": null,
+  "blackPearlCategory": null,
+  "blackPearlCategoryUnionName": null,
+  "type": "standard",
+  "typeDesc": "标准商品",
+  "isStandard": "0",
+  "isStandardDesc": "否",
+  "source": "head_purchase",
+  "sourceDesc": "锅圈直采",
+  "alias": "",
+  "desc": "自动化测试数据",
+  "status": 20,
+  "statusDesc": "待审核",
+  "createTime": "2026-08-07 12:19:00",
+  "updateTime": "2026-08-07 12:19:00",
+  "creatorName": "王钦",
+  "isSelected": null,
+  "isShow": null,
+  "jindieCode": null,
+  "editorInfoRespModel": null,
+  "sceneResModel": null,
+  "pushKingKee": null,
+  "purchasingSkuCodes": null,
+  "brand": null,
+  "brandDesc": null,
+  "purchaseSpuSpecList": [
+    {
+      "purchaseSpuId": 9551,
+      "purchaseSpuSpecId": 8653,
+      "purchaseSpuCode": null,
+      "purchaseSpuSpecValue": "2g/串*200串",
+      "specId": 1,
+      "specValue": "2",
+      "barCode": "1008789AWR",
+      "scmSpuBusinessTypeList": [],
+      "purchaseSpuChannelStatusList": [
+        {
+          "channel": "kingdee",
+          "channelDesc": "金蝶",
+          "channelStatus": 0,
+          "channelStatusDesc": "未转换"
+        },
+        {
+          "channel": "yunpu",
+          "channelDesc": "锅圈云铺",
+          "channelStatus": 0,
+          "channelStatusDesc": "未转换"
+        },
+        {
+          "channel": "product",
+          "channelDesc": "商品中心",
+          "channelStatus": 0,
+          "channelStatusDesc": "未转换"
+        }
+      ]
+    }
+  ],
+  "purchaseSpuChannelStatusList": [
+    {
+      "channel": "kingdee",
+      "channelDesc": "金蝶",
+      "channelStatus": 0,
+      "channelStatusDesc": "未转换"
+    },
+    {
+      "channel": "yunpu",
+      "channelDesc": "锅圈云铺",
+      "channelStatus": 0,
+      "channelStatusDesc": "未转换"
+    },
+    {
+      "channel": "product",
+      "channelDesc": "商品中心",
+      "channelStatus": 0,
+      "channelStatusDesc": "未转换"
+    }
+  ],
+  "scmSpuBusinessTypeList": [],
+  "isNewAdd": null,
+  "jinDiePurchaseSpuSpecValue": null,
+  "purchasingSpuSpecId": null
+}
