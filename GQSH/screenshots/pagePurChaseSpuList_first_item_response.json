@@ -1,9 +1,9 @@
 {
-  "purchaseSpuId": 9559,
-  "code": "105680",
+  "purchaseSpuId": 9561,
+  "code": "105682",
   "productPoolCode": null,
   "supplierProductName": null,
-  "purchasingName": "自动产品名称20260807174810",
+  "purchasingName": "自动产品名称20260810101622",
   "parentCategory": null,
   "firstCategory": null,
   "category": "火锅类/肉卷类/羊肉卷类/羊肉",
@@ -22,8 +22,8 @@
   "desc": "自动化测试数据",
   "status": 20,
   "statusDesc": "待审核",
-  "createTime": "2026-08-07 17:48:11",
-  "updateTime": "2026-08-07 17:48:11",
+  "createTime": "2026-08-10 10:16:23",
+  "updateTime": "2026-08-10 10:16:23",
   "creatorName": "王钦",
   "isSelected": null,
   "isShow": null,
@@ -36,13 +36,13 @@
   "brandDesc": null,
   "purchaseSpuSpecList": [
     {
-      "purchaseSpuId": 9559,
-      "purchaseSpuSpecId": 8661,
+      "purchaseSpuId": 9561,
+      "purchaseSpuSpecId": 8663,
       "purchaseSpuCode": null,
       "purchaseSpuSpecValue": "2g/串*200串",
       "specId": 1,
       "specValue": "2",
-      "barCode": "4908864QQQ",
+      "barCode": "5292517LZV",
       "scmSpuBusinessTypeList": [],
       "purchaseSpuChannelStatusList": [
         {

@@ -55,7 +55,10 @@ def global_config():
         'lifeCycleTypeValue': None, # 商品产品生命周期类型值
         'purchaseSpuCode': None, # 产品管理采购SPU编码
         'purchaseSpuId': None, # 产品管理采购SPU ID
+        'purchaseSpuSpecId': None, # 产品管理采购SPU规格 ID
+        'purchasingName': None, # 新建采购SPU名称（串联后续查询）
         'kingDeeSkuCode': None, # 金蝶SKU编码
+        'kingDeeDetailInfo': None, # 金蝶明细查询结果（内存传递）
     }
 
 
@@ -64,5 +67,6 @@ def set_env_vars(global_config):
     for key, value in global_config.items():
         os.environ[key] = str(value)
     yield
+    print(f'\n【kingDeeSkuCode】{global_config.get("kingDeeSkuCode")}')
     for key in global_config:
         os.environ.pop(key, None)

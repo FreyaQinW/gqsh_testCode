@@ -2,8 +2,8 @@
   "success": true,
   "data": {
     "entranceFlag": null,
-    "purchasingSpuCode": "105680",
-    "purchasingName": "自动产品名称20260807174810",
+    "purchasingSpuCode": "105682",
+    "purchasingName": "自动产品名称20260810101622",
     "kingDeeCategory": null,
     "kingDeeCategoryCodeList": [
       "1000",
@@ -35,7 +35,7 @@
       {
         "kingDeeSkuId": null,
         "kingDeeSkuCode": null,
-        "purchasingSpuSpecId": 8661,
+        "purchasingSpuSpecId": 8663,
         "kingDeeSkuStatus": false,
         "purchasingUserCode": "1015",
         "purchasingUsername": "刘亚威",
@@ -50,7 +50,7 @@
         "purchaseGroupCodes": null,
         "roleCode": null,
         "specValue": "2g/串*200串",
-        "barCode": "4908864QQQ",
+        "barCode": "5292517LZV",
         "specUnit": "SPZXDWZ0325326",
         "specUnitDesc": "件",
         "grossWeight": "",

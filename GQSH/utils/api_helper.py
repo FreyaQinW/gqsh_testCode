@@ -8,8 +8,8 @@ import pytest
 import requests
 
 
-def post_api(global_config, path, body, timeout=10):
-    """发送 POST 请求，网络异常时直接 fail"""
+def post_api(global_config, path, body, timeout=10, fail_on_error=True):
+    """发送 POST 请求；默认网络异常时 fail，fail_on_error=False 时抛出原异常供重试"""
     url = global_config['test_URL'] + path
     try:
         return requests.post(
@@ -20,7 +20,9 @@ def post_api(global_config, path, body, timeout=10):
             verify=True,
         )
     except requests.exceptions.RequestException as e:
-        pytest.fail(f'网络请求失败: {e}')
+        if fail_on_error:
+            pytest.fail(f'网络请求失败: {e}')
+        raise
 
 
 def get_api(global_config, path, timeout=10):
