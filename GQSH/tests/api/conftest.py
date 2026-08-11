@@ -67,6 +67,8 @@ def set_env_vars(global_config):
     for key, value in global_config.items():
         os.environ[key] = str(value)
     yield
-    print(f'\n【kingDeeSkuCode】{global_config.get("kingDeeSkuCode")}')
+    print(f'\n【purchasingName】{global_config.get("purchasingName")}')
+    print(f'【kingDeeSkuCode】{global_config.get("kingDeeSkuCode")}')
+    print(f'【purchaseSpuId】{global_config.get("purchaseSpuId")}')
     for key in global_config:
         os.environ.pop(key, None)
