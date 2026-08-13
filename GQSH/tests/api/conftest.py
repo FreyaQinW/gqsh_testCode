@@ -59,6 +59,9 @@ def global_config():
         'purchasingName': None, # 新建采购SPU名称（串联后续查询）
         'kingDeeSkuCode': None, # 金蝶SKU编码
         'kingDeeDetailInfo': None, # 金蝶明细查询结果（内存传递）
+        'cloudSkuCode': None, # 云埔SKU编码
+        'cloudSpuId': None, # 云埔SPU ID
+        'cloudSkuId': None, # 云埔SKU ID
     }
 
 

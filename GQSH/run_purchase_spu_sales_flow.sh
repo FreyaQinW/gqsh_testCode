@@ -13,4 +13,5 @@ fi
 $VENV -m pytest \
   tests/api/ProductOss2/ProductPortfolioManagement/test_PurChaseSpu.py \
   tests/api/ProductOss2/ProductPortfolioManagement/test_ProductSalesRegionSettings.py \
+  tests/api/ProductOss2/ProductPortfolioManagement/test_productCloudSku.py \
   -v --tb=short -s
