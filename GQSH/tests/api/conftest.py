@@ -62,6 +62,10 @@ def global_config():
         'cloudSkuCode': None, # 云埔SKU编码
         'cloudSpuId': None, # 云埔SPU ID
         'cloudSkuId': None, # 云埔SKU ID
+        'controlSalesNo': None, # 商品控销管理编号
+        'billType': None, # 商品控销管理单据类型
+        'salesType': None, # 商品控销管理销售类型
+        'controlSalesSkuCode': None, # 商品控销管理SKU编码
     }
 
 
