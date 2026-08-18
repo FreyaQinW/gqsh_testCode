@@ -8,7 +8,7 @@ from utils.api_helper import parse_json, post_api, assert_success
 
 
 @pytest.mark.oms
-def test_queryControlSalesPage(global_config):
+def test_queryControlSalesPage(global_config, product_ctx):
     """商品控销管理 - 分页查询控销列表"""
     response = post_api(
         global_config,
@@ -31,20 +31,20 @@ def test_queryControlSalesPage(global_config):
 
     # 提取商品控销管理相关字段作为公共参数
     if items:
-        global_config['controlSalesNo'] = items[0].get('controlSalesNo')
-        global_config['billType'] = items[0].get('billType')
-        global_config['salesType'] = items[0].get('salesType')
-        print(f'商品控销管理 controlSalesNo: {global_config["controlSalesNo"]}')
-        print(f'商品控销管理 billType: {global_config["billType"]}')
-        print(f'商品控销管理 salesType: {global_config["salesType"]}')
+        product_ctx['controlSalesNo'] = items[0].get('controlSalesNo')
+        product_ctx['billType'] = items[0].get('billType')
+        product_ctx['salesType'] = items[0].get('salesType')
+        print(f'商品控销管理 controlSalesNo: {product_ctx["controlSalesNo"]}')
+        print(f'商品控销管理 billType: {product_ctx["billType"]}')
+        print(f'商品控销管理 salesType: {product_ctx["salesType"]}')
 
 
 @pytest.mark.oms
-def test_saveProdControlSales(global_config):
+def test_saveProdControlSales(global_config, product_ctx):
     """商品控销管理 - 编辑修改控销单"""
-    control_sales_no = global_config.get('controlSalesNo')
-    bill_type = global_config.get('billType')
-    sales_type = global_config.get('salesType')
+    control_sales_no = product_ctx.get('controlSalesNo')
+    bill_type = product_ctx.get('billType')
+    sales_type = product_ctx.get('salesType')
     if not control_sales_no or not bill_type or not sales_type:
         pytest.skip('未获取到商品控销管理公共参数，跳过编辑修改控销单测试')
 
@@ -79,7 +79,7 @@ def test_saveProdControlSales(global_config):
 
 
 @pytest.mark.oms
-def test_queryPurChaseSkuPageList(global_config):
+def test_queryPurChaseSkuPageList(global_config, product_ctx):
     """商品控销管理 - 查询采购SKU分页列表"""
     response = post_api(
         global_config,
@@ -107,6 +107,6 @@ def test_queryPurChaseSkuPageList(global_config):
 
     # 提取商品控销管理 skuCode 作为公共参数
     if items:
-        global_config['controlSalesSkuCode'] = items[0].get('skuCode')
-        print(f'商品控销管理 skuCode: {global_config["controlSalesSkuCode"]}')
+        product_ctx['controlSalesSkuCode'] = items[0].get('skuCode')
+        print(f'商品控销管理 skuCode: {product_ctx["controlSalesSkuCode"]}')
 

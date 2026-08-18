@@ -1,9 +1,7 @@
 # *-*coding:utf-8 *-*
 import os
-from utils.csv_reader import load_csv_row
 
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_CSV_PATH = os.path.join(_BASE_DIR, 'data', 'AuthorSCMS.csv')
+from utils.credentials import load_scms_credentials
 
 
 class SCMSConfig:
@@ -11,12 +9,8 @@ class SCMSConfig:
 
     @staticmethod
     def url() -> str:
-        return 'https://test-scms.zzgqsh.com'
+        return os.environ.get('SCMS_BASE_URL', 'https://test-scms.zzgqsh.com').rstrip('/')
 
     @staticmethod
     def credentials() -> dict:
-        row = load_csv_row(_CSV_PATH)
-        return {
-            'username': row['username'],
-            'password': row['password'],
-        }
+        return load_scms_credentials()

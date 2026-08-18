@@ -13,6 +13,8 @@ def global_config():
     refresh_scms_token()
     Author = load_csv_data(os.path.join(_DATA_DIR, 'AuthorSupplier.csv'))
     token = Author.split('scmsToken=')[1]
+    base_url = os.environ.get('SCMS_BASE_URL', 'https://test-scms.zzgqsh.com').rstrip('/')
+    host = base_url.split('://', 1)[-1]
     Cookie = 'guoquan_monitor_uuid=1768285139701; gq_token=' + Author
     header = {
         'Accept': 'application/json, text/plain, */*',
@@ -20,9 +22,9 @@ def global_config():
         'Accept-Language': 'zh-CN,zh;q=0.9',
         'Connection': 'keep-alive',
         'Content-Type': 'application/json',
-        'Host': 'test-scms.zzgqsh.com',
-        'Origin': 'https://test-scms.zzgqsh.com',
-        'Referer': 'https://test-scms.zzgqsh.com',
+        'Host': host,
+        'Origin': base_url,
+        'Referer': base_url,
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
         'Token': token,
         'Sign': 'decb9ffab03916881bcd412827be6a45',
@@ -30,7 +32,7 @@ def global_config():
         'Cookie': Cookie,
     }
     return {
-        'test_URL': 'https://test-scms.zzgqsh.com',
+        'test_URL': base_url,
         'header': header,
         # 优先从环境变量读取（与 oss2 联合运行时由对应模块写入）
         'JINDIE_PURCHASE_ORDER_NO': os.environ.get('JINDIE_PURCHASE_ORDER_NO') or None,

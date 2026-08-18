@@ -9,7 +9,7 @@ from utils.api_helper import parse_json, post_api, assert_success, assert_list_n
 
 
 @pytest.mark.oms
-def test_queryLifeCycleList(global_config):
+def test_queryLifeCycleList(global_config, product_ctx):
     """产品生命周期 - 查询产品生命周期列表"""
     response = post_api(
         global_config,
@@ -31,14 +31,14 @@ def test_queryLifeCycleList(global_config):
     items = data.get('list') or data.get('records') or []
     if items:
         purchase_spu_code = items[0].get('purchaseSpuCode')
-        global_config['purchaseSpuCode'] = purchase_spu_code
+        product_ctx['purchaseSpuCode'] = purchase_spu_code
         print(f'产品生命周期 purchaseSpuCode: {purchase_spu_code}')
 
 
 @pytest.mark.oms
-def test_queryLifeCycleDetailsList(global_config):
+def test_queryLifeCycleDetailsList(global_config, product_ctx):
     """产品生命周期 - 查询产品生命周期明细列表"""
-    purchase_spu_code = global_config.get('purchaseSpuCode')
+    purchase_spu_code = product_ctx.get('purchaseSpuCode')
     if not purchase_spu_code:
         pytest.skip('未获取到 purchaseSpuCode，跳过明细列表测试')
 
@@ -59,15 +59,15 @@ def test_queryLifeCycleDetailsList(global_config):
     if not items:
         pytest.skip('产品生命周期明细列表无数据，跳过')
     dept_code = items[0].get('deptCode')
-    global_config['deptCode'] = dept_code
+    product_ctx['deptCode'] = dept_code
     print(f'产品生命周期明细 deptCode: {dept_code}')
 
 
 @pytest.mark.oms
-def test_queryLifeCycleDetailsList1(global_config):
+def test_queryLifeCycleDetailsList1(global_config, product_ctx):
     """产品生命周期 - 查询产品生命周期明细列表（含deptCode）"""
-    purchase_spu_code = global_config.get('purchaseSpuCode')
-    dept_code = global_config.get('deptCode')
+    purchase_spu_code = product_ctx.get('purchaseSpuCode')
+    dept_code = product_ctx.get('deptCode')
     if not purchase_spu_code or not dept_code:
         pytest.skip('未获取到 purchaseSpuCode 或 deptCode，跳过明细列表测试')
 
@@ -89,14 +89,14 @@ def test_queryLifeCycleDetailsList1(global_config):
     if not items:
         pytest.skip('产品生命周期明细列表1无数据，跳过')
     prod_life_house_id = items[0].get('prodLifeHouseId')
-    global_config['prodLifeHouseId'] = prod_life_house_id
+    product_ctx['prodLifeHouseId'] = prod_life_house_id
     print(f'产品生命周期明细 prodLifeHouseId: {prod_life_house_id}')
 
 
 @pytest.mark.oms
-def test_queryLifeCycleTypeList(global_config):
+def test_queryLifeCycleTypeList(global_config, product_ctx):
     """产品生命周期 - 查询生命周期类型列表"""
-    prod_life_house_id = global_config.get('prodLifeHouseId')
+    prod_life_house_id = product_ctx.get('prodLifeHouseId')
     if not prod_life_house_id:
         pytest.skip('未获取到 prodLifeHouseId，跳过类型列表测试')
 
@@ -117,16 +117,16 @@ def test_queryLifeCycleTypeList(global_config):
     if not items:
         pytest.skip('生命周期类型列表无数据，跳过')
     life_cycle_type_value = items[0].get('value')
-    global_config['lifeCycleTypeValue'] = life_cycle_type_value
+    product_ctx['lifeCycleTypeValue'] = life_cycle_type_value
     print(f'生命周期类型 value: {life_cycle_type_value}')
 
 
 @pytest.mark.oms
-def test_updateScmLifeCycle(global_config):
+def test_updateScmLifeCycle(global_config, product_ctx):
     """产品生命周期 - 更新产品生命周期状态"""
-    prod_life_house_id = global_config.get('prodLifeHouseId')
-    life_cycle_type_value = global_config.get('lifeCycleTypeValue')
-    jinDeeCode = global_config.get('purchaseSpuCode')
+    prod_life_house_id = product_ctx.get('prodLifeHouseId')
+    life_cycle_type_value = product_ctx.get('lifeCycleTypeValue')
+    jinDeeCode = product_ctx.get('purchaseSpuCode')
     if not prod_life_house_id or not life_cycle_type_value:
         pytest.skip('未获取到 prodLifeHouseId 或 lifeCycleTypeValue，跳过更新测试')
 
@@ -152,9 +152,9 @@ def test_updateScmLifeCycle(global_config):
 
 
 @pytest.mark.oms
-def test_queryLifeCycleByJinDieCodeList(global_config):
+def test_queryLifeCycleByJinDieCodeList(global_config, product_ctx):
     """产品生命周期 - 根据金蝶编码查询生命周期列表"""
-    purchase_spu_code = global_config.get('purchaseSpuCode')
+    purchase_spu_code = product_ctx.get('purchaseSpuCode')
     if not purchase_spu_code:
         pytest.skip('未获取到 purchaseSpuCode，跳过金蝶编码查询测试')
 

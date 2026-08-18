@@ -6,6 +6,8 @@ import os
 import time
 import requests as _requests
 
+from utils.credentials import load_oss2_credentials, load_scms_credentials
+
 _DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 
 
@@ -38,7 +40,8 @@ def get_oss2_token(username: str, password: str) -> str:
 
 
 def save_token(token: str, csv_path: str):
-    """将 token 写入 CSV 文件"""
+    """将 token 写入本地 CSV（已 gitignore，不入库）"""
+    os.makedirs(os.path.dirname(csv_path) or '.', exist_ok=True)
     with open(csv_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['token'])
@@ -46,12 +49,11 @@ def save_token(token: str, csv_path: str):
 
 
 def refresh_oss2_token():
-    """自动登录并刷新 data/Author.csv 中的 token"""
-    from utils.csv_reader import load_csv_row
-    creds = load_csv_row(os.path.join(_DATA_DIR, 'AuthorOSS2.csv'))
+    """自动登录并刷新本地 data/Author.csv 中的 token"""
+    creds = load_oss2_credentials()
     token = get_oss2_token(creds['username'], creds['password'])
     save_token(token, os.path.join(_DATA_DIR, 'Author.csv'))
-    print(f'[auto_login] OSS2 token 已刷新')
+    print('[auto_login] OSS2 token 已刷新')
     return token
 
 
@@ -76,10 +78,9 @@ def get_scms_token(username: str, password: str) -> str:
 
 
 def refresh_scms_token():
-    """自动登录并刷新 data/AuthorSupplier.csv 中的 SCMS token"""
-    from utils.csv_reader import load_csv_row
-    creds = load_csv_row(os.path.join(_DATA_DIR, 'AuthorSCMS.csv'))
+    """自动登录并刷新本地 data/AuthorSupplier.csv 中的 SCMS token"""
+    creds = load_scms_credentials()
     token = get_scms_token(creds['username'], creds['password'])
     save_token(token, os.path.join(_DATA_DIR, 'AuthorSupplier.csv'))
-    print(f'[auto_login] SCMS token 已刷新')
+    print('[auto_login] SCMS token 已刷新')
     return token

@@ -4,7 +4,11 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from utils.api_helper import assert_list_not_empty, assert_success, post_and_assert
+from utils.api_helper import (
+    assert_list_not_empty,
+    post_and_assert,
+    set_jindie_order_no,
+)
 
 ADD_API = (
     '/api/supplier-admin/supplier-admin/interior/purchaseApplicationRecords/addPurchaseApplication'
@@ -34,7 +38,7 @@ def _query_params(approval_status_list):
     }
 
 
-@pytest.mark.run(order=1)
+@pytest.mark.run(order=10)
 def test_purchaseOrderAdd(global_config):
     """采购申请单新增"""
     apply_date = datetime.now().strftime('%Y-%m-%d')
@@ -72,7 +76,7 @@ def test_purchaseOrderAdd(global_config):
     logging.info('采购申请单新增完成 %s', json_data)
 
 
-@pytest.mark.run(order=2)
+@pytest.mark.run(order=20)
 def test_purchaseApplicationOrderSearch(global_config):
     """条件查询待审核的采购申请单"""
     body = _query_params([0])
@@ -86,7 +90,7 @@ def test_purchaseApplicationOrderSearch(global_config):
     logging.info('采购申请单编码为 %s', order_no)
 
 
-@pytest.mark.run(order=3)
+@pytest.mark.run(order=30)
 def test_purchaseApplicationAudit(global_config):
     """采购申请审核---最新版本"""
     logging.info('%s', global_config['documentNo'])
@@ -103,16 +107,26 @@ def test_purchaseApplicationAudit(global_config):
     logging.info('采购申请单列表 %s', json_data)
 
 
-@pytest.mark.run(order=4)
+@pytest.mark.run(order=40)
 def test_purchaseApplicationApprovedOrderSearch(global_config):
-    """条件查询审核通过的采购申请单"""
+    """条件查询审核通过的采购申请单，并桥接金蝶采购单号到 SCMS"""
     body = _query_params([1])
     logging.info('请求参数为 %s', body)
     json_data = post_and_assert(global_config, QUERY_API, body, '已审核采购申请单查询')
     logging.info('采购申请单列表 %s', json_data)
     assert_list_not_empty(json_data, '已审核采购申请单')
-    order_no = json_data.get('data', {}).get('list', [{}])[0].get('relatedOrder')
+    items = json_data.get('data', {}).get('list') or []
+    document_no = global_config.get('documentNo')
+    matched = None
+    if document_no:
+        for item in items:
+            if item.get('documentNo') == document_no:
+                matched = item
+                break
+    if matched is None:
+        matched = items[0]
+    order_no = matched.get('relatedOrder')
     if not order_no:
         pytest.fail('请重新查询采购订单编码')
-    global_config['JINDIE_PURCHASE_ORDER_NO'] = order_no
-    logging.info('采购申请单编码为 %s', order_no)
+    set_jindie_order_no(global_config, order_no)
+    logging.info('金蝶采购订单编码为 %s (documentNo=%s)', order_no, matched.get('documentNo'))

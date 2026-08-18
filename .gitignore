@@ -11,3 +11,12 @@ htmlcov/
 
 # IDE / local tooling
 **/.claude/settings.local.json
+
+# Secrets & local auth caches (copy *.example → real files locally)
+GQSH/data/Author.csv
+GQSH/data/AuthorOSS2.csv
+GQSH/data/AuthorSCMS.csv
+GQSH/data/AuthorSupplier.csv
+*.env
+.env.*
+!.env.example

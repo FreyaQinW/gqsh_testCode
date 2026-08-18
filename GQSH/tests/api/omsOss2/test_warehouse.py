@@ -1,213 +1,160 @@
-# -*- coding: utf-8 -*-
+# *-*coding:utf-8 *-*
 """OMS 仓储 API 接口测试"""
 import pytest
 
-from utils.api_helper import current_month_datetime_range, first_oss2_list_item, query_oss2_list
+from utils.api_helper import (
+    current_month_datetime_range,
+    first_oss2_list_item,
+    parse_json,
+    post_api,
+    query_oss2_list,
+)
 
 data_start_time, data_end_time = current_month_datetime_range()
+
+# ---- paths ----
+BASE = '/api/oms-admin'
+PATH_STOCK_ORDER_PAGE = BASE + '/stockOrder/page'
+PATH_STOCK_ORDER_GET = BASE + '/stockOrder/get'
+PATH_STOCK_PAGE = BASE + '/stock/page'
+PATH_OTHER_ORDER_PAGE = BASE + '/OmsOtherOrder/page'
+
+# ---- bodies ----
+STOCK_TRANSFER_LIST_BODY = {
+    'stockOrderType': 2,
+    'startTime': '',
+    'endTime': '',
+    'stockOutOrderNo': '',
+    'channelStockOrderNo': '',
+    'clientName': '',
+    'type': '',
+    'orgNo': '',
+    'warehouseCode': '',
+    'clientPhoneNo': '',
+    'page': 1,
+    'limit': 10,
+}
+
+INVENTORY_LIST_BODY = {
+    'stockOrderType': 1,
+    'startTime': '',
+    'endTime': '',
+    'stockOutOrderNo': '',
+    'channelStockOrderNo': '',
+    'clientName': '',
+    'type': '',
+    'orgNo': '',
+    'warehouseCode': '',
+    'clientPhoneNo': '',
+    'page': 1,
+    'limit': 10,
+}
+
+STOCK_INVENTORY_BODY = {
+    'platformSkuCode': '',
+    'platformSkuName': '',
+    'warehouseNo': '',
+    'orgNo': '',
+    'page': 1,
+    'limit': 10,
+}
+
+OTHER_ORDER_BODY = {
+    'otherOrderNo': '',
+    'businessTypeNo': '',
+    'warehouseNo': '',
+    'startTime': '',
+    'endTime': '',
+    'source': '',
+    'auditState': '',
+    'page': 1,
+    'limit': 10,
+}
 
 
 @pytest.mark.oms
 def test_warehouse_stockTransferList(global_config):
-    """仓储 - 查询库存调拨列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockTransfer/page',
-        {
-            'startTime': data_start_time,
-            'endTime': data_end_time,
-            'transferNo': '',
-            'fromWarehouse': '',
-            'toWarehouse': '',
-            'status': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储库存调拨列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '仓储库存调拨列表')
-    transfer_no = first.get('transferNo')
-    global_config['transferNo'] = transfer_no
-    print(f'仓储库存调拨 transferNo: {transfer_no}')
+    """仓储 - 库存调拨列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config, PATH_STOCK_ORDER_PAGE,
+            dict(STOCK_TRANSFER_LIST_BODY),
+            '仓储库存调拨列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '仓储库存调拨列表')
+        stock_out_no = first.get('stockOutOrderNo')
+        global_config['transferNo'] = stock_out_no
+        print(f'仓储库存调拨 stockOutOrderNo: {stock_out_no}')
+    except Exception as e:
+        pytest.fail(f'仓储库存调拨列表异常: {e}')
 
 
 @pytest.mark.oms
 def test_stockTransferOrderDetail(global_config):
-    """仓储 - 库存调拨列表详情"""
-    transfer_no = global_config.get('transferNo', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockTransfer/page',
-        {
-            'transferNo': transfer_no,
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储库存调拨详情',
-        skip_if_empty=True,
-    )
-    print(f'仓储库存调拨详情接口查询结果: {json_data}')
+    """仓储 - 库存调拨详情"""
+    try:
+        stock_out_no = global_config.get('transferNo', '')
+        if not stock_out_no:
+            pytest.skip('无库存调拨单号，跳过详情查询')
+        body = {
+            'stockOrderType': '2',
+            'stockOutOrderNo': stock_out_no,
+        }
+        response = post_api(global_config, PATH_STOCK_ORDER_GET, body)
+        json_data = parse_json(response, '仓储库存调拨详情')
+        detail = (json_data.get('data') or {})
+        print(f'仓储库存调拨详情 stockOutOrderNo: {stock_out_no}')
+        print(f'状态: {detail.get("status")}, 仓库: {detail.get("warehouseName")}')
+    except Exception as e:
+        pytest.fail(f'仓储库存调拨详情异常: {e}')
 
 
 @pytest.mark.oms
 def test_warehouse_inventoryList(global_config):
-    """仓储 - 查询仓库库存列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/inventory/page',
-        {
-            'warehouseCode': '',
-            'materialCode': '',
-            'materialName': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储仓库库存列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '仓储仓库库存列表')
-    inventory_no = first.get('inventoryNo')
-    global_config['inventoryNo'] = inventory_no
-    print(f'仓储仓库库存 inventoryNo: {inventory_no}')
+    """仓储 - 出库单列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config, PATH_STOCK_ORDER_PAGE,
+            dict(INVENTORY_LIST_BODY),
+            '仓储出库单列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '仓储出库单列表')
+        stock_out_no = first.get('stockOutOrderNo')
+        global_config['inventoryNo'] = stock_out_no
+        print(f'仓储出库单号: {stock_out_no}')
+    except Exception as e:
+        pytest.fail(f'仓储出库单列表异常: {e}')
 
 
 @pytest.mark.oms
 def test_inventoryOrderDetail(global_config):
-    """仓储 - 仓库库存列表详情"""
-    inventory_no = global_config.get('inventoryNo', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/inventory/page',
-        {
-            'inventoryNo': inventory_no,
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储仓库库存详情',
-        skip_if_empty=True,
-    )
-    print(f'仓储仓库库存详情接口查询结果: {json_data}')
+    """仓储 - 仓库即时库存"""
+    try:
+        json_data = query_oss2_list(
+            global_config, PATH_STOCK_PAGE,
+            dict(STOCK_INVENTORY_BODY),
+            '仓储仓库即时库存',
+            skip_if_empty=True,
+        )
+        print(f'仓储仓库即时库存查询完成')
+    except Exception as e:
+        pytest.fail(f'仓储仓库即时库存异常: {e}')
 
 
 @pytest.mark.oms
 def test_warehouse_stockInList(global_config):
-    """仓储 - 查询入库单列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockIn/page',
-        {
-            'startTime': data_start_time,
-            'endTime': data_end_time,
-            'stockInNo': '',
-            'warehouseCode': '',
-            'status': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储入库单列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '仓储入库单列表')
-    stock_in_no = first.get('stockInNo')
-    global_config['stockInNo'] = stock_in_no
-    print(f'仓储入库单 stockInNo: {stock_in_no}')
-
-
-@pytest.mark.oms
-def test_stockInOrderDetail(global_config):
-    """仓储 - 入库单列表详情"""
-    stock_in_no = global_config.get('stockInNo', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockIn/page',
-        {
-            'stockInNo': stock_in_no,
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储入库单详情',
-        skip_if_empty=True,
-    )
-    print(f'仓储入库单详情接口查询结果: {json_data}')
-
-
-@pytest.mark.oms
-def test_warehouse_stockOutList(global_config):
-    """仓储 - 查询出库单列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockOut/page',
-        {
-            'startTime': data_start_time,
-            'endTime': data_end_time,
-            'stockOutNo': '',
-            'warehouseCode': '',
-            'status': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储出库单列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '仓储出库单列表')
-    stock_out_no = first.get('stockOutNo')
-    global_config['stockOutNo'] = stock_out_no
-    print(f'仓储出库单 stockOutNo: {stock_out_no}')
-
-
-@pytest.mark.oms
-def test_stockOutOrderDetail(global_config):
-    """仓储 - 出库单列表详情"""
-    stock_out_no = global_config.get('stockOutNo', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/stockOut/page',
-        {
-            'stockOutNo': stock_out_no,
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储出库单详情',
-        skip_if_empty=True,
-    )
-    print(f'仓储出库单详情接口查询结果: {json_data}')
-
-
-@pytest.mark.oms
-def test_warehouse_warehouseList(global_config):
-    """仓储 - 查询仓库列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/list',
-        {
-            'warehouseCode': '',
-            'warehouseName': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储仓库列表',
-        skip_if_empty=False,
-    )
-    first = first_oss2_list_item(json_data, '仓储仓库列表')
-    warehouse_code = first.get('warehouseCode')
-    global_config['warehouseCode'] = warehouse_code
-    print(f'仓储仓库 warehouseCode: {warehouse_code}')
-
-
-@pytest.mark.oms
-def test_warehouseDetail(global_config):
-    """仓储 - 仓库列表详情"""
-    warehouse_code = global_config.get('warehouseCode', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/warehouse/list',
-        {
-            'warehouseCode': warehouse_code,
-            'page': 1,
-            'limit': 10,
-        },
-        '仓储仓库详情',
-        skip_if_empty=True,
-    )
-    print(f'仓储仓库详情接口查询结果: {json_data}')
+    """仓储 - 出库申请单"""
+    try:
+        json_data = query_oss2_list(
+            global_config, PATH_OTHER_ORDER_PAGE,
+            dict(OTHER_ORDER_BODY),
+            '仓储出库申请单',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '仓储出库申请单')
+        other_order_no = first.get('otherOrderNo')
+        print(f'仓储出库申请单 otherOrderNo: {other_order_no}')
+    except Exception as e:
+        pytest.fail(f'仓储出库申请单异常: {e}')

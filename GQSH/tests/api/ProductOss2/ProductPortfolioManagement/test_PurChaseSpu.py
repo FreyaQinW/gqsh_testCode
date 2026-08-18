@@ -28,39 +28,39 @@ def _extract_list_items(json_data):
     return data if isinstance(data, list) else []
 
 
-def _store_spu_context(global_config, item):
+def _store_spu_context(product_ctx, item):
     """从列表项写入后续用例共用的 SPU 上下文"""
     purchase_spu_code = item.get('code')
     if purchase_spu_code:
-        global_config['purchaseSpuCode'] = purchase_spu_code
+        product_ctx['purchaseSpuCode'] = purchase_spu_code
         print(f'【采购SPU Code】{purchase_spu_code}')
 
     purchase_spu_id = item.get('purchaseSpuId')
     if purchase_spu_id:
-        global_config['purchaseSpuId'] = purchase_spu_id
+        product_ctx['purchaseSpuId'] = purchase_spu_id
         print(f'【采购SPU ID】{purchase_spu_id}')
 
     spec_list = item.get('purchaseSpuSpecList') or []
     if spec_list:
         purchase_spu_spec_id = spec_list[0].get('purchaseSpuSpecId')
         if purchase_spu_spec_id:
-            global_config['purchaseSpuSpecId'] = purchase_spu_spec_id
+            product_ctx['purchaseSpuSpecId'] = purchase_spu_spec_id
             print(f'【采购SPU Spec ID】{purchase_spu_spec_id}')
 
 
-def _require_spu_fields(global_config, *keys):
-    missing = [k for k in keys if not global_config.get(k)]
+def _require_spu_fields(product_ctx, *keys):
+    missing = [k for k in keys if not product_ctx.get(k)]
     if missing:
         pytest.skip(f'未获取到 {", ".join(missing)}，跳过')
 
 
 @pytest.mark.oms
 @pytest.mark.order(1)
-def test_savePurchaseSpuInfo(global_config):
+def test_savePurchaseSpuInfo(global_config, product_ctx):
     """产品管理 - 新增采购SPU"""
     purchasing_name = _unique_purchasing_name()
     bar_code = _unique_bar_code()
-    global_config['purchasingName'] = purchasing_name
+    product_ctx['purchasingName'] = purchasing_name
 
     response = post_api(
         global_config,
@@ -131,23 +131,23 @@ def test_savePurchaseSpuInfo(global_config):
 
     data = json_data.get('data')
     if isinstance(data, str) and data:
-        global_config['purchaseSpuCode'] = data
+        product_ctx['purchaseSpuCode'] = data
     elif isinstance(data, dict):
         code = data.get('code') or data.get('purchaseSpuCode') or data.get('purchasingSpuCode')
         if code:
-            global_config['purchaseSpuCode'] = code
+            product_ctx['purchaseSpuCode'] = code
         spu_id = data.get('purchaseSpuId') or data.get('id')
         if spu_id:
-            global_config['purchaseSpuId'] = spu_id
-    print(f'【新建采购SPU】name={purchasing_name}, code={global_config.get("purchaseSpuCode")}')
+            product_ctx['purchaseSpuId'] = spu_id
+    print(f'【新建采购SPU】name={purchasing_name}, code={product_ctx.get("purchaseSpuCode")}')
 
 
 @pytest.mark.oms
 @pytest.mark.order(2)
-def test_pagePurChaseSpuList(global_config):
+def test_pagePurChaseSpuList(global_config, product_ctx):
     """产品管理 - 分页查询采购SPU列表 - 定位新建待审核SPU"""
-    target_code = global_config.get('purchaseSpuCode') or ''
-    target_name = global_config.get('purchasingName') or ''
+    target_code = product_ctx.get('purchaseSpuCode') or ''
+    target_name = product_ctx.get('purchasingName') or ''
 
     response = post_api(
         global_config,
@@ -191,15 +191,15 @@ def test_pagePurChaseSpuList(global_config):
         matched = items[0]
         print('未指定新建SPU，回退使用列表首条')
 
-    _store_spu_context(global_config, matched)
+    _store_spu_context(product_ctx, matched)
 
 
 @pytest.mark.oms
 @pytest.mark.order(3)
-def test_updatePurchaseSpuInfo(global_config):
+def test_updatePurchaseSpuInfo(global_config, product_ctx):
     """产品管理 - 更新采购SPU状态 - 审核"""
-    _require_spu_fields(global_config, 'purchaseSpuCode')
-    purchase_spu_code = global_config['purchaseSpuCode']
+    _require_spu_fields(product_ctx, 'purchaseSpuCode')
+    purchase_spu_code = product_ctx['purchaseSpuCode']
 
     response = post_api(
         global_config,
@@ -218,9 +218,9 @@ def test_updatePurchaseSpuInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(4)
-def test_saveOrDelete(global_config):
+def test_saveOrDelete(global_config, product_ctx):
     """产品管理 - 根据ID、code 配置业务类型"""
-    _require_spu_fields(global_config, 'purchaseSpuId', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuId', 'purchaseSpuSpecId')
 
     response = post_api(
         global_config,
@@ -231,8 +231,8 @@ def test_saveOrDelete(global_config):
                 "black_pearl", "tiktok", "f2b", "gq_ticket",
                 "xc_o2o", "hk_o2o"
             ],
-            "purchaseSpuId": global_config['purchaseSpuId'],
-            "purchaseSpuSpecId": global_config['purchaseSpuSpecId']
+            "purchaseSpuId": product_ctx['purchaseSpuId'],
+            "purchaseSpuSpecId": product_ctx['purchaseSpuSpecId']
         }
     )
     json_data = parse_json(response, '配置业务类型')
@@ -242,16 +242,16 @@ def test_saveOrDelete(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(5)
-def test_queueConvertPublish(global_config):
+def test_queueConvertPublish(global_config, product_ctx):
     """产品管理 - 转换 、金蝶、云埔、商品中心"""
-    _require_spu_fields(global_config, 'purchaseSpuId', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuId', 'purchaseSpuSpecId')
 
     response = post_api(
         global_config,
         '/api/shop-admin/shop-admin/purchase/spu/queueConvertPublish',
         {
-            "purchaseSpuId": global_config['purchaseSpuId'],
-            "purchaseSpuSpecId": global_config['purchaseSpuSpecId']
+            "purchaseSpuId": product_ctx['purchaseSpuId'],
+            "purchaseSpuSpecId": product_ctx['purchaseSpuSpecId']
         }
     )
     json_data = parse_json(response, '队列转换发布')
@@ -261,10 +261,10 @@ def test_queueConvertPublish(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(6)
-def test_queryKingDeeDetailInfo(global_config):
+def test_queryKingDeeDetailInfo(global_config, product_ctx):
     """产品管理 - 查询金蝶明细信息"""
-    _require_spu_fields(global_config, 'purchaseSpuCode')
-    purchase_spu_code = global_config['purchaseSpuCode']
+    _require_spu_fields(product_ctx, 'purchaseSpuCode')
+    purchase_spu_code = product_ctx['purchaseSpuCode']
 
     response = post_api(
         global_config,
@@ -277,23 +277,23 @@ def test_queryKingDeeDetailInfo(global_config):
     assert_success(json_data, '查询金蝶明细信息')
     print(f'查询金蝶明细信息 响应: {json.dumps(json_data, ensure_ascii=False, indent=2)}')
 
-    global_config['kingDeeDetailInfo'] = json_data.get('data') or {}
+    product_ctx['kingDeeDetailInfo'] = json_data.get('data') or {}
 
 
 @pytest.mark.oms
 @pytest.mark.order(7)
-def test_saveKingDeeDetailInfo(global_config):
+def test_saveKingDeeDetailInfo(global_config, product_ctx):
     """产品管理 - 保存金蝶明细信息"""
-    _require_spu_fields(global_config, 'purchaseSpuCode', 'purchaseSpuSpecId')
-    purchase_spu_code = global_config['purchaseSpuCode']
-    purchase_spu_spec_id = global_config['purchaseSpuSpecId']
+    _require_spu_fields(product_ctx, 'purchaseSpuCode', 'purchaseSpuSpecId')
+    purchase_spu_code = product_ctx['purchaseSpuCode']
+    purchase_spu_spec_id = product_ctx['purchaseSpuSpecId']
 
-    kd = global_config.get('kingDeeDetailInfo')
+    kd = product_ctx.get('kingDeeDetailInfo')
     if not kd:
         pytest.skip('未获取到金蝶明细信息（kingDeeDetailInfo），跳过保存金蝶明细信息测试')
 
     king_dee_sku_code = f"{purchase_spu_code}1"
-    global_config['kingDeeSkuCode'] = king_dee_sku_code
+    product_ctx['kingDeeSkuCode'] = king_dee_sku_code
     sku = (kd.get('skuInfoModelList') or [{}])[0]
 
     print(f'purchaseSpuCode: {purchase_spu_code}')
@@ -384,11 +384,11 @@ def test_saveKingDeeDetailInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(8)
-def test_pushProductStatusBySpu(global_config):
+def test_pushProductStatusBySpu(global_config, product_ctx):
     """产品管理 - 推送产品状态到金蝶（轮询重试，避免固定 sleep）"""
-    _require_spu_fields(global_config, 'purchaseSpuCode')
-    purchase_spu_code = global_config['purchaseSpuCode']
-    king_dee_sku_code = global_config.get('kingDeeSkuCode')
+    _require_spu_fields(product_ctx, 'purchaseSpuCode')
+    purchase_spu_code = product_ctx['purchaseSpuCode']
+    king_dee_sku_code = product_ctx.get('kingDeeSkuCode')
 
     request_body = {
         "channel": "kingDee",
@@ -449,9 +449,9 @@ def test_queryKingDeeChannelSpuList(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(10)
-def test_getCloudSkuInfo(global_config):
+def test_getCloudSkuInfo(global_config, product_ctx):
     """产品管理 - 获取云SKU信息"""
-    _require_spu_fields(global_config, 'purchaseSpuCode', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuCode', 'purchaseSpuSpecId')
 
     response = post_api(
         global_config,
@@ -459,8 +459,8 @@ def test_getCloudSkuInfo(global_config):
         {
             "type": "edit",
             "change": 1,
-            "purchaseSpuCode": global_config['purchaseSpuCode'],
-            "purchaseSpuSpecId": global_config['purchaseSpuSpecId'],
+            "purchaseSpuCode": product_ctx['purchaseSpuCode'],
+            "purchaseSpuSpecId": product_ctx['purchaseSpuSpecId'],
             "saleUnitInfoList": [
                 {
                     "saleUnit": "SPZXDWZ0325326",
@@ -480,11 +480,11 @@ def test_getCloudSkuInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(11)
-def test_saveCloudSkuInfo(global_config):
+def test_saveCloudSkuInfo(global_config, product_ctx):
     """产品管理 - 保存云SKU信息"""
-    _require_spu_fields(global_config, 'purchaseSpuCode', 'purchaseSpuId', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuCode', 'purchaseSpuId', 'purchaseSpuSpecId')
 
-    product_name = global_config.get('purchasingName') or _unique_purchasing_name()
+    product_name = product_ctx.get('purchasingName') or _unique_purchasing_name()
     barCode = _unique_bar_code()
 
     response = post_api(
@@ -495,15 +495,15 @@ def test_saveCloudSkuInfo(global_config):
             "shortName": product_name,
             "fullName": product_name,
             "pricingManner": "",
-            "purchaseSpuCode": global_config['purchaseSpuCode'],
-            "purchaseSpuId": global_config['purchaseSpuId'],
+            "purchaseSpuCode": product_ctx['purchaseSpuCode'],
+            "purchaseSpuId": product_ctx['purchaseSpuId'],
             "skuCodeList": [],
             "skuName": product_name,
             "specQualityList": [
                 {
                     "barCode": barCode,
                     "solids": None,
-                    "purchaseSpuSpecId": global_config['purchaseSpuSpecId'],
+                    "purchaseSpuSpecId": product_ctx['purchaseSpuSpecId'],
                     "shippingPrice": "199",
                     "minPrice": "",
                     "saleUnit": "SPZXDWZ0325326",
@@ -545,17 +545,17 @@ def test_saveCloudSkuInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(12)
-def test_queryPurchaseSkuDetailInfo(global_config):
+def test_queryPurchaseSkuDetailInfo(global_config, product_ctx):
     """产品管理 - 查询采购SKU明细"""
-    _require_spu_fields(global_config, 'purchaseSpuCode', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuCode', 'purchaseSpuSpecId')
 
     response = post_api(
         global_config,
         '/api/shop-admin/shop-admin/purchase/sku/queryPurchaseSkuDetailInfo',
         {
-            "purchaseSpuCode": global_config['purchaseSpuCode'],
+            "purchaseSpuCode": product_ctx['purchaseSpuCode'],
             "businessTypeList": ["o2o", "next_day_delivery", "b2c", "f2b", "hk_o2o"],
-            "purchaseSpuSpecId": global_config['purchaseSpuSpecId']
+            "purchaseSpuSpecId": product_ctx['purchaseSpuSpecId']
         }
     )
     json_data = parse_json(response, '查询采购SKU明细')
@@ -565,13 +565,13 @@ def test_queryPurchaseSkuDetailInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(13)
-def test_savePurchaseSkuDetailInfo(global_config):
+def test_savePurchaseSkuDetailInfo(global_config, product_ctx):
     """产品转换为商品中心"""
-    _require_spu_fields(global_config, 'purchaseSpuCode', 'purchaseSpuSpecId')
+    _require_spu_fields(product_ctx, 'purchaseSpuCode', 'purchaseSpuSpecId')
 
-    purchase_spu_code = global_config['purchaseSpuCode']
-    purchasing_name = global_config.get('purchasingName') or ''
-    purchase_spu_spec_id = global_config['purchaseSpuSpecId']
+    purchase_spu_code = product_ctx['purchaseSpuCode']
+    purchasing_name = product_ctx.get('purchasingName') or ''
+    purchase_spu_spec_id = product_ctx['purchaseSpuSpecId']
     barCode = _unique_bar_code()
 
     request_body = {

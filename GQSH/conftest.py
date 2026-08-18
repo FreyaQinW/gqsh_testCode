@@ -24,11 +24,17 @@ def pytest_collection_modifyitems(items):
             item.add_marker(pytest.mark.order(order))
 
 
+def _headless_enabled() -> bool:
+    """默认无头；HEADLESS=0/false/no 时显示浏览器（便于本地调试）"""
+    raw = os.environ.get('HEADLESS', 'true').strip().lower()
+    return raw not in ('0', 'false', 'no', 'off')
+
+
 @pytest.fixture(scope="session")
 def browser():
     """启动 Chromium 浏览器（整个测试 session 共用）"""
     with playwright.sync_api.sync_playwright() as p:
-        b = p.chromium.launch(headless=False)
+        b = p.chromium.launch(headless=_headless_enabled())
         yield b
         b.close()
 

@@ -10,9 +10,9 @@ from utils.api_helper import parse_json, post_api, assert_success
 
 @pytest.mark.oms
 @pytest.mark.order(100)
-def test_queryCloudSkuListPage(global_config):
+def test_queryCloudSkuListPage(global_config, product_ctx):
     """云埔商品管理 - 分页查询云SKU列表"""
-    purchase_spu_code = global_config.get('purchaseSpuCode') or ''
+    purchase_spu_code = product_ctx.get('purchaseSpuCode') or ''
 
     response = post_api(
         global_config,
@@ -45,15 +45,15 @@ def test_queryCloudSkuListPage(global_config):
         if sku_list:
             sku_code = sku_list[0].get('skuCode')
             if sku_code:
-                global_config['cloudSkuCode'] = sku_code
+                product_ctx['cloudSkuCode'] = sku_code
                 print(f'【云埔编码】{sku_code}')
 
 
 @pytest.mark.oms
 @pytest.mark.order(101)
-def test_addMultipleSkuCode(global_config):
+def test_addMultipleSkuCode(global_config, product_ctx):
     """设置云埔报货系数"""
-    cloud_sku_code = global_config.get('cloudSkuCode')
+    cloud_sku_code = product_ctx.get('cloudSkuCode')
     if not cloud_sku_code:
         pytest.skip('未获取到 cloudSkuCode，跳过设置云埔报货系数测试')
 
@@ -83,9 +83,9 @@ def test_addMultipleSkuCode(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(102)
-def test_queryPageCouldList(global_config):
+def test_queryPageCouldList(global_config, product_ctx):
     """根据云埔编码查询列表"""
-    cloud_sku_code = global_config.get('cloudSkuCode') or ''
+    cloud_sku_code = product_ctx.get('cloudSkuCode') or ''
 
     request_body = {
         "saleSetInfoReqModelList": [
@@ -125,20 +125,20 @@ def test_queryPageCouldList(global_config):
         sku_list_vo = items[0].get('skuListVoList') or []
         sku_id = sku_list_vo[0].get('skuId') if sku_list_vo else None
         if spu_id:
-            global_config['cloudSpuId'] = spu_id
+            product_ctx['cloudSpuId'] = spu_id
             print(f'【云埔 spuId】{spu_id}')
         if sku_id:
-            global_config['cloudSkuId'] = sku_id
+            product_ctx['cloudSkuId'] = sku_id
             print(f'【云埔 skuId】{sku_id}')
 
 
 @pytest.mark.oms
 @pytest.mark.order(103)
-def test_saveSpuDescInfo(global_config):
+def test_saveSpuDescInfo(global_config, product_ctx):
     """更新云埔商品媒资库信息"""
-    cloud_spu_id = global_config.get('cloudSpuId')
-    purchase_spu_code = global_config.get('purchaseSpuCode')
-    cloud_sku_code = global_config.get('cloudSkuCode')
+    cloud_spu_id = product_ctx.get('cloudSpuId')
+    purchase_spu_code = product_ctx.get('purchaseSpuCode')
+    cloud_sku_code = product_ctx.get('cloudSkuCode')
     if not cloud_spu_id or not purchase_spu_code or not cloud_sku_code:
         pytest.skip('未获取到 cloudSpuId/purchaseSpuCode/cloudSkuCode，跳过更新云埔商品媒资库信息测试')
 
@@ -208,10 +208,10 @@ def test_saveSpuDescInfo(global_config):
 
 @pytest.mark.oms
 @pytest.mark.order(104)
-def test_saveSkuSalesSettings(global_config):
+def test_saveSkuSalesSettings(global_config, product_ctx):
     """云埔商品售卖区域设置"""
-    cloud_sku_id = global_config.get('cloudSkuId')
-    cloud_spu_id = global_config.get('cloudSpuId')
+    cloud_sku_id = product_ctx.get('cloudSkuId')
+    cloud_spu_id = product_ctx.get('cloudSpuId')
     if not cloud_sku_id or not cloud_spu_id:
         pytest.skip('未获取到 cloudSkuId 或 cloudSpuId，跳过云埔商品售卖区域设置测试')
 

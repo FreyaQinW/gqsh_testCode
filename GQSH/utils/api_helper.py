@@ -2,6 +2,7 @@
 """API 测试公共工具：请求封装、响应断言、日期范围生成"""
 import calendar
 import json
+import os
 from datetime import datetime, timedelta
 
 import pytest
@@ -261,6 +262,26 @@ def extract_jindie_order_no(json_data):
     order_no = json_data.get('data', {}).get('list', [{}])[0].get('jindiePurchaseOrderNo')
     if not order_no:
         pytest.fail('请重新查询采购订单编码')
+    return order_no
+
+
+def set_jindie_order_no(global_config, order_no):
+    """写入金蝶采购单号到当前 config，并同步到环境变量（跨 OSS2/SCMS fixture）。"""
+    if not order_no:
+        pytest.fail('金蝶采购单号为空，无法写入')
+    order_no = str(order_no)
+    global_config['JINDIE_PURCHASE_ORDER_NO'] = order_no
+    os.environ['JINDIE_PURCHASE_ORDER_NO'] = order_no
+    return order_no
+
+
+def get_jindie_order_no(global_config, *, required=False):
+    """读取金蝶采购单号：优先 global_config，其次环境变量。"""
+    order_no = global_config.get('JINDIE_PURCHASE_ORDER_NO') or os.environ.get('JINDIE_PURCHASE_ORDER_NO')
+    if order_no in (None, '', 'None'):
+        order_no = None
+    if required and not order_no:
+        pytest.fail('缺少金蝶采购单号，请先完成采购申请审核或订单查询')
     return order_no
 
 

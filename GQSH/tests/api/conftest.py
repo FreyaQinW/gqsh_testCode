@@ -1,5 +1,10 @@
 # *-*coding:utf-8 *-*
-"""OSS2 / OMS OSS2 模块共享 API 测试配置"""
+"""OSS2 / OMS / Product / quality 共享 API 客户端配置。
+
+仅提供 test_URL + header（及跨系统桥接键）。
+业务上下文请放到各模块 conftest（如 ProductOss2 的 product_ctx）。
+其他模块仍可向本 dict 动态写入，以兼容存量用例。
+"""
 import os
 
 import pytest
@@ -9,12 +14,24 @@ from utils.csv_reader import load_csv_data
 
 _DATA_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'data')
 
+# 跨系统联合跑时需要落到环境变量的键（supplier → scms 等）
+_ENV_BRIDGE_KEYS = (
+    'JINDIE_PURCHASE_ORDER_NO',
+    'INSERTED_SUPPLIER_CODE',
+    'INSERTED_SUPPLIER_NAME',
+    'INSERTED_SUPPLIER_INNER_CODE',
+    'INSERTED_PRODUCER_CODE',
+    'INSERTED_PRODUCER_NAME',
+)
+
 
 @pytest.fixture(scope='session')
 def global_config():
-    """OSS2 运营后台 API 全局配置（自动登录刷新 token）"""
+    """OSS2 API 客户端：登录刷新 token，返回 URL + header。"""
     refresh_oss2_token()
     author = load_csv_data(os.path.join(_DATA_DIR, 'Author.csv'))
+    base_url = os.environ.get('OSS2_BASE_URL', 'https://test-oss2.zzgqsh.com').rstrip('/')
+    host = base_url.split('://', 1)[-1]
     cookie = f'guoquan_monitor_uuid=1768285139701; gq_token={author}'
     header = {
         'Accept': 'application/json, text/plain, */*',
@@ -22,9 +39,9 @@ def global_config():
         'Accept-Language': 'zh-CN,zh;q=0.9',
         'Connection': 'keep-alive',
         'Content-Type': 'application/json',
-        'Host': 'test-oss2.zzgqsh.com',
-        'Origin': 'https://test-oss2.zzgqsh.com',
-        'Referer': 'https://test-oss2.zzgqsh.com',
+        'Host': host,
+        'Origin': base_url,
+        'Referer': base_url,
         'User-Agent': (
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
@@ -34,48 +51,16 @@ def global_config():
         'Cookie': cookie,
     }
     return {
-        'test_URL': 'https://test-oss2.zzgqsh.com',
+        'test_URL': base_url,
         'header': header,
-        'JINDIE_PURCHASE_ORDER_NO': None,
-        'documentNo': None, # 采购申请单编号
-        'relatedOrder': None,   # 相关订单
-        'productSourceCode': None,  # 生产商编码
-        'name': None, # 名称
-        'nameCode': None,  # 名称编码
-        'omsOrderNo':None, # OMS 订单号
-        "purchaseOrderNo":None, # 采购单号
-        'complainId': None, # 投诉 ID
-        'qualityInspectionId': None,    # 质量检验 ID
-        'producerReportId': None,   # 生产报告 ID
-        'packageProductCode': None, # 包装产品编码
-        'accidentId': None, # 质量事故 ID
-        'purchase_spu_code': None, # 商品中心编码
-        'deptCode': None, # 商品中心仓库编码
-        'prodLifeHouseId': None, # 商品产品生命周期仓库 ID
-        'lifeCycleTypeValue': None, # 商品产品生命周期类型值
-        'purchaseSpuCode': None, # 产品管理采购SPU编码
-        'purchaseSpuId': None, # 产品管理采购SPU ID
-        'purchaseSpuSpecId': None, # 产品管理采购SPU规格 ID
-        'purchasingName': None, # 新建采购SPU名称（串联后续查询）
-        'kingDeeSkuCode': None, # 金蝶SKU编码
-        'kingDeeDetailInfo': None, # 金蝶明细查询结果（内存传递）
-        'cloudSkuCode': None, # 云埔SKU编码
-        'cloudSpuId': None, # 云埔SPU ID
-        'cloudSkuId': None, # 云埔SKU ID
-        'controlSalesNo': None, # 商品控销管理编号
-        'billType': None, # 商品控销管理单据类型
-        'salesType': None, # 商品控销管理销售类型
-        'controlSalesSkuCode': None, # 商品控销管理SKU编码
     }
 
 
 @pytest.fixture(scope='session', autouse=True)
 def set_env_vars(global_config):
-    for key, value in global_config.items():
-        os.environ[key] = str(value)
+    """仅同步跨系统桥接键，避免把 header 等整包写入 environ。"""
     yield
-    print(f'\n【purchasingName】{global_config.get("purchasingName")}')
-    print(f'【kingDeeSkuCode】{global_config.get("kingDeeSkuCode")}')
-    print(f'【purchaseSpuId】{global_config.get("purchaseSpuId")}')
-    for key in global_config:
-        os.environ.pop(key, None)
+    for key in _ENV_BRIDGE_KEYS:
+        value = global_config.get(key)
+        if value not in (None, '', 'None'):
+            os.environ[key] = str(value)

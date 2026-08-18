@@ -1,9 +1,7 @@
 # *-*coding:utf-8 *-*
 import os
-from utils.csv_reader import load_csv_row
 
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_CSV_PATH = os.path.join(_BASE_DIR, 'data', 'AuthorOSS2.csv')
+from utils.credentials import load_oss2_credentials
 
 
 class OSS2Config:
@@ -11,12 +9,8 @@ class OSS2Config:
 
     @staticmethod
     def url() -> str:
-        return 'https://test-oss2.zzgqsh.com'
+        return os.environ.get('OSS2_BASE_URL', 'https://test-oss2.zzgqsh.com').rstrip('/')
 
     @staticmethod
     def credentials() -> dict:
-        row = load_csv_row(_CSV_PATH)
-        return {
-            'username': row['username'],
-            'password': row['password'],
-        }
+        return load_oss2_credentials()
