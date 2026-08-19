@@ -5,115 +5,201 @@ import pytest
 from utils.api_helper import (
     current_month_datetime_range,
     first_oss2_list_item,
+    parse_json,
     pick_oss2_id,
+    post_api,
     post_and_assert_oss2,
     query_oss2_list,
 )
 
 data_start_time, data_end_time = current_month_datetime_range()
 
-_SYNC_LIST_BODY = {
-    'startTime': data_start_time,
-    'endTime': data_end_time,
-    'sourceType': '',
-    'syncStatus': '',
+_DY_LIST_BODY = {
+    'createTimeBegin': '',
+    'createTimeEnd': '',
+    'orderNo': '',
+    'shopId': '',
+    'shopName': '',
+    'page': 1,
+    'limit': 10,
+}
+
+_DY_REFUND_LIST_BODY = {
+    'createTimeBegin': '',
+    'createTimeEnd': '',
+    'refundNo': '',
+    'shopId': '',
+    'shopName': '',
+    'orderNo': '',
+    'page': 1,
+    'limit': 10,
+}
+
+_WDT_SALE_STOCK_OUT_BODY = {
+    'createTimeBegin': '',
+    'createTimeEnd': '',
+    'thirdStockOutNo': '',
+    'thirdOrderNo': '',
+    'thirdSourceNo': '',
+    'relationBillType': '',
+    'warehouseCode': '',
+    'shopNo': '',
+    'syncStockStatus': '',
+    'syncJdStatus': '',
+    'page': 1,
+    'limit': 10,
+}
+
+_WDT_REFUND_STOCK_IN_BODY = {
+    'createTimeBegin': '',
+    'createTimeEnd': '',
+    'refundNo': '',
+    'shopId': '',
+    'shopName': '',
+    'orderNo': '',
     'page': 1,
     'limit': 10,
 }
 
 
 @pytest.mark.oms
-def test_thirdPartyData_syncList(global_config):
-    """三方数据 - 查询三方数据同步列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/syncList',
-        dict(_SYNC_LIST_BODY),
-        '三方数据同步列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '三方数据同步列表')
-    third_party_data_no = first.get('thirdPartyDataNo')
-    global_config['thirdPartyDataNo'] = third_party_data_no
-    print(f'三方数据 thirdPartyDataNo: {third_party_data_no}')
+def test_thirdPartyData_dyList(global_config):
+    """三方数据 - 查询抖店订单列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config,
+            '/api/oms-admin/thirdOrder/dy/orderPage',
+            dict(_DY_LIST_BODY),
+            '抖店订单列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '抖店订单列表')
+        shop_id = first.get('shopId')
+        order_no = first.get('orderNo')
+        if shop_id:
+            global_config['dyShopId'] = shop_id
+            print(f'抖店 shopId: {shop_id}')
+        if order_no:
+            global_config['dyOrderNo'] = order_no
+            print(f'抖店 orderNo: {order_no}')
+    except Exception as e:
+        pytest.fail(f'抖店订单列表异常: {e}')
 
 
 @pytest.mark.oms
-def test_thirdPartyDataDetail(global_config):
-    """三方数据 - 三方数据同步列表详情"""
-    third_party_data_no = global_config.get('thirdPartyDataNo', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/syncList',
-        {
-            'thirdPartyDataNo': third_party_data_no,
-            'page': 1,
-            'limit': 10,
-        },
-        '三方数据同步详情',
-        skip_if_empty=True,
-    )
-    print(f'三方数据同步详情接口查询结果: {json_data}')
+def test_thirdPartyData_dyDetail(global_config):
+    """三方数据 - 查询抖店订单详情"""
+    try:
+        order_no = global_config.get('dyOrderNo', '')
+        shop_id = global_config.get('dyShopId', '')
+        if not order_no or not shop_id:
+            pytest.skip('无抖店订单参数，跳过详情查询')
+        body = {
+            'orderNo': order_no,
+            'shopId': shop_id,
+        }
+        response = post_api(global_config, '/api/oms-admin/thirdOrder/dy/orderDetail', body)
+        json_data = parse_json(response, '抖店订单详情')
+        detail = json_data.get('data') or {}
+        print(f'抖店订单详情 orderNo: {order_no}, shopId: {shop_id}')
+        print(f'响应数据: {detail}')
+    except Exception as e:
+        pytest.fail(f'抖店订单详情异常: {e}')
 
 
 @pytest.mark.oms
-def test_thirdPartyData_syncDetail(global_config):
-    """三方数据 - 先查同步列表取主键，再查详情"""
-    list_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/syncList',
-        dict(_SYNC_LIST_BODY),
-        '三方数据同步列表',
-        skip_if_empty=True,
-    )
-    item = first_oss2_list_item(list_data, '三方数据同步列表')
-    id_key, id_value = pick_oss2_id(item, 'syncId', 'id', 'taskId', 'batchNo')
-    post_and_assert_oss2(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/syncDetail',
-        {
-            id_key: id_value,
-            'startTime': data_start_time,
-            'endTime': data_end_time,
-        },
-        '三方数据同步详情',
-    )
+def test_thirdPartyData_dy_refundOrderList(global_config):
+    """三方数据 - 查询抖店售后列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config,
+            '/api/oms-admin/thirdOrder/dy/refundOrderPage',
+            dict(_DY_REFUND_LIST_BODY),
+            '抖店售后列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '抖店售后列表')
+        refund_no = first.get('refundNo')
+        if refund_no:
+            global_config['dyRefundNo'] = refund_no
+            print(f'抖店售后 refundNo: {refund_no}')
+    except Exception as e:
+        pytest.fail(f'抖店售后列表异常: {e}')
 
 
 @pytest.mark.oms
-def test_thirdPartyData_channelList(global_config):
-    """三方数据 - 查询渠道数据列表"""
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/channelList',
-        {
-            'channelCode': '',
-            'channelName': '',
-            'page': 1,
-            'limit': 10,
-        },
-        '三方数据渠道列表',
-        skip_if_empty=True,
-    )
-    first = first_oss2_list_item(json_data, '三方数据渠道列表')
-    channel_code = first.get('channelCode')
-    global_config['channelCode'] = channel_code
-    print(f'三方数据渠道 channelCode: {channel_code}')
+def test_third_wdt_saleStockOutList(global_config):
+    """三方数据 - 查询旺店通销售出库列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config,
+            '/api/oms-admin/api/third/wdt/saleStockOut/page',
+            dict(_WDT_SALE_STOCK_OUT_BODY),
+            '旺店通销售出库列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '旺店通销售出库列表')
+        third_stock_out_no = first.get('thirdStockOutNo')
+        if third_stock_out_no:
+            global_config['wdtThirdStockOutNo'] = third_stock_out_no
+            print(f'旺店通销售出库 thirdStockOutNo: {third_stock_out_no}')
+    except Exception as e:
+        pytest.fail(f'旺店通销售出库列表异常: {e}')
 
 
 @pytest.mark.oms
-def test_channelDataDetail(global_config):
-    """三方数据 - 渠道数据列表详情"""
-    channel_code = global_config.get('channelCode', '')
-    json_data = query_oss2_list(
-        global_config,
-        '/api/oms-admin/api/thirdPartyData/channelList',
-        {
-            'channelCode': channel_code,
-            'page': 1,
-            'limit': 10,
-        },
-        '三方数据渠道详情',
-        skip_if_empty=True,
-    )
-    print(f'三方数据渠道详情接口查询结果: {json_data}')
+def test_third_wdt_saleStockOutDetail(global_config):
+    """三方数据 - 查询旺店通销售出库单据详情"""
+    try:
+        third_stock_out_no = global_config.get('wdtThirdStockOutNo', '')
+        if not third_stock_out_no:
+            pytest.skip('无旺店通销售出库单号，跳过详情查询')
+        body = {
+            'thirdStockOutNo': third_stock_out_no,
+        }
+        response = post_api(global_config, '/api/oms-admin/api/third/wdt/saleStockOut/detail', body)
+        json_data = parse_json(response, '旺店通销售出库单据详情')
+        detail = json_data.get('data') or {}
+        print(f'旺店通销售出库单据详情 thirdStockOutNo: {third_stock_out_no}')
+        print(f'响应数据: {detail}')
+    except Exception as e:
+        pytest.fail(f'旺店通销售出库单据详情异常: {e}')
+
+
+@pytest.mark.oms
+def test_third_wdt_refundStockInList(global_config):
+    """三方数据 - 查询旺店通销售退货列表"""
+    try:
+        json_data = query_oss2_list(
+            global_config,
+            '/api/oms-admin/api/third/wdt/refundStockIn/page',
+            dict(_WDT_REFUND_STOCK_IN_BODY),
+            '旺店通销售退货列表',
+            skip_if_empty=True,
+        )
+        first = first_oss2_list_item(json_data, '旺店通销售退货列表')
+        refund_no = first.get('thirdRefundNo')
+        if refund_no:
+            global_config['wdtThirdRefundNo'] = refund_no
+            print(f'旺店通销售退货 thirdRefundNo: {refund_no}')
+    except Exception as e:
+        pytest.fail(f'旺店通销售退货列表异常: {e}')
+
+
+@pytest.mark.oms
+def test_third_wdt_refundStockInDetail(global_config):
+    """三方数据 - 查询旺店通销售退货详情"""
+    try:
+        third_refund_no = global_config.get('wdtThirdRefundNo', '')
+        if not third_refund_no:
+            pytest.skip('无旺店通销售退货单号，跳过详情查询')
+        body = {
+            'thirdRefundNo': third_refund_no,
+        }
+        response = post_api(global_config, '/api/oms-admin/api/third/wdt/refundStockIn/detail', body)
+        json_data = parse_json(response, '旺店通销售退货详情')
+        detail = json_data.get('data') or {}
+        print(f'旺店通销售退货详情 thirdRefundNo: {third_refund_no}')
+        print(f'响应数据: {detail}')
+    except Exception as e:
+        pytest.fail(f'旺店通销售退货详情异常: {e}')
