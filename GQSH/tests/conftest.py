@@ -1,5 +1,5 @@
 # *-*coding:utf-8 *-*
-"""OSS2 / OMS / Product / quality 共享 API 客户端配置。
+"""OSS2 / OMS / Product / quality / swagger 共享 API 客户端配置。
 
 仅提供 test_URL + header（及跨系统桥接键）。
 业务上下文请放到各模块 conftest（如 ProductOss2 的 product_ctx）。
@@ -12,7 +12,7 @@ import pytest
 from utils.auto_login import refresh_oss2_token
 from utils.csv_reader import load_csv_data
 
-_DATA_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'data')
+_DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 
 # 跨系统联合跑时需要落到环境变量的键（supplier → scms 等）
 _ENV_BRIDGE_KEYS = (
@@ -26,8 +26,8 @@ _ENV_BRIDGE_KEYS = (
 
 
 @pytest.fixture(scope='session')
-def global_config():
-    """OSS2 API 客户端：登录刷新 token，返回 URL + header。"""
+def oss2_config():
+    """OSS2 登录与 header，供 api / swagger 等复用。"""
     refresh_oss2_token()
     author = load_csv_data(os.path.join(_DATA_DIR, 'Author.csv'))
     base_url = os.environ.get('OSS2_BASE_URL', 'https://test-oss2.zzgqsh.com').rstrip('/')
@@ -54,6 +54,12 @@ def global_config():
         'test_URL': base_url,
         'header': header,
     }
+
+
+@pytest.fixture(scope='session')
+def global_config(oss2_config):
+    """OSS2 API 客户端：登录刷新 token，返回 URL + header。"""
+    return oss2_config
 
 
 @pytest.fixture(scope='session', autouse=True)
